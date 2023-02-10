@@ -6,6 +6,7 @@ import SlideDrawer, { DrawerItemNonLink } from "../Components/sideNav";
 import { Cell, ListTable, HeaderRow, ExpandableRow } from "../Components/tableComponents";
 import {CSVLink} from "react-csv";
 import U from "../Utilities/utilities";
+import { AiFillCaretDown } from 'react-icons/ai';
 
 export const searchSuggestions = [
 ]
@@ -241,13 +242,15 @@ export default class DatapageLayout extends React.Component {
                         <ListTable settings={this.settings}>
                             <HeaderRow>
                                 {Object.keys(this.props.headers).map((key, index) => {
-                                    return <Cell width={"100%"} key={index}>{this.props.headers[key].displayHeader}</Cell>
+                                    return <Cell width={"100%"} key={index}>{this.props.headers[key].displayHeader}
+                                    <AiFillCaretDown/></Cell>
                                 })}
                             </HeaderRow>
                             {this.state.data && 
                             
-                            currentItems.map((row, index) => {      
+                            currentItems.map((row, index) => {   
                                 return <ExpandableRow 
+                                mod = {this.props.mod} // added this line to check which mod before displaying expandable row
                                 updateHandle={this.props.updateHandle} 
                                 values={row} 
                                 fieldSettings={this.props.fieldSettings} 
@@ -257,7 +260,6 @@ export default class DatapageLayout extends React.Component {
                                 setExpansionContent={this.setExpansionContent} 
                                 handleSeeMore={this.handleSeeMore} 
                                 handleClose={this.handleClose} 
-                                hasFields={this.props.hasFields}
                                 popUpContent={this.state.popUpContent}
                                 perms={this.state.perms}>
                                     {this.props.children? 
@@ -343,10 +345,6 @@ export default class DatapageLayout extends React.Component {
         )
     }
 }
-DatapageLayout.defaultProps = {
-    hasFields: true
-}
-
 export class TableHeader extends React.Component {
     constructor(props) {
         super(props);

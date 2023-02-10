@@ -1,5 +1,8 @@
 import React from "react";
 import { StdInput } from "./input";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "../styles/Tabs.scss";
+import toast from 'react-simple-toasts';
 
 export class ExpandableRow extends React.Component {
   constructor(props) {
@@ -49,7 +52,11 @@ export class ExpandableRow extends React.Component {
         onMouseLeave={this.handleButtonRelease}
         className={"expandableRow"}
       >
-        <div className={this.state.rowClasses} onClick={this.expand}  style={{"--Columns": Object.keys(this.props.headers).length}}>
+        <div
+          className={this.state.rowClasses}
+          onClick={this.expand}
+          style={{ "--Columns": Object.keys(this.props.headers).length }}
+        >
           {/* {this.props.headers.map((cell, secIndex) => {
             return (
               <Cell width={"100%"} key={secIndex}>
@@ -59,26 +66,22 @@ export class ExpandableRow extends React.Component {
           })}
            */}
           {Object.keys(this.props.headers).map((key, index) => {
-            return <Cell width={"100%"} key={index}>{
-              this.props.fieldSettings[key].type === "dropdown"?
-                this.props.fieldSettings[key].options.find((option) => option.value === this.props.values[key])?.label
-              :
-              this.props.values[key]
-              
-            }</Cell>
+            return (
+              <Cell width={"100%"} key={index}>
+                {this.props.fieldSettings[key].type === "dropdown"
+                  ? this.props.fieldSettings[key].options.find(
+                      (option) => option.value === this.props.values[key]
+                    )?.label
+                  : this.props.values[key]}
+              </Cell>
+            );
           })}
         </div>
         {this.state.expanded ? (
           <div className={this.state.expandedClass}>
             <div className="row justify-content-center align-items-start expandedRow">
-
               <div className="col-12 col-lg-9 expansionColumn">
-                <div className="expansionColumn-fieldcontainer">
-                  
-
-                {
-                this.props.hasFields ?
-                Object.keys(this.props.fieldSettings).map((field, index) => {
+                {/* {Object.keys(this.props.fieldSettings).map((field, index) => {
                   return (
                     <StdInput
                       key={index}
@@ -95,10 +98,10 @@ export class ExpandableRow extends React.Component {
                       toolTip={this.props.fieldSettings[field].toolTip}
                     ></StdInput>
                   );
-                })
-                :
-                ""}
-                </div>
+                })} */}
+
+                <RenderByModule this={this} mod={this.props.mod} />
+
                 {this.props.children}
               </div>
             </div>
@@ -108,6 +111,121 @@ export class ExpandableRow extends React.Component {
         )}
       </div>
     );
+  }
+}
+function LeftTabsExample(props) {
+  const th = props.this;
+  return (
+    <Tabs>
+      <TabList>
+        <Tab>
+          <p>Project Details</p>
+        </Tab>
+        <Tab>
+          <p>Contributors</p>
+        </Tab>
+      </TabList>
+
+      <TabPanel>
+        <div className="panel-content">
+          <div className="expansionColumn-fieldcontainer">
+            {Object.keys(th.props.fieldSettings).map((field, index) => {
+              console.log(field);
+              return (
+                <StdInput
+                  key={index}
+                  label={th.props.fieldSettings[field].displayLabel}
+                  fieldLabel={field}
+                  type={th.props.fieldSettings[field].type}
+                  enabled={
+                    th.props.perms.Update
+                      ? th.props.fieldSettings[field].editable
+                      : false
+                  }
+                  hasSaveBtn={true}
+                  showIndicator={th.props.fieldSettings[field].editable}
+                  value={th.props.values[field]}
+                  onChange={th.updateHandle}
+                  options={th.props.fieldSettings[field].options}
+                  dateFormat={th.props.fieldSettings[field].dateFormat}
+                  toolTip={th.props.fieldSettings[field].toolTip}
+                ></StdInput>
+              );
+            })}
+          </div>
+          <button onClick={() => toast('Project has been deleted. Click here to undo', 3000)}>Delete</button>
+        </div>
+      </TabPanel>
+      <TabPanel>
+        <div
+          className="panel-content"
+          style={{ display: "flex", flexDirection: "column" }}
+        >
+          <div style={{ textAlign: "right" }}>
+            <p style={{ display: "inline" }}>Add contributors</p>
+            <button>Add</button>
+          </div>
+          <div>
+            <table style={{ width: "100%" }}>
+              <tr style={{  backgroundColor: "#dddddd"}}>
+                <th style={{ padding: "8px" }}>ID</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+              <tr>
+                <td style={{ padding: "8px" }}>21012</td>
+                <td>Maria Anders</td>
+                <td>Volunteer</td>
+                <td>Remove</td>
+              </tr>
+              <tr>
+                <td style={{ padding: "8px" }}>21013</td>
+                <td>Francisco Chang</td>
+                <td>Staff</td>
+                <td>Remove</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </TabPanel>
+    </Tabs>
+  );
+}
+function RenderByModule(props) {
+  const th = props.this;
+  switch (props.mod) {
+    case "project":
+      return <LeftTabsExample this={props.this} />;
+      break;
+    default:
+      return (
+        <div className="expansionColumn-fieldcontainer">
+          {Object.keys(th.props.fieldSettings).map((field, index) => {
+            console.log(field);
+            return (
+              <StdInput
+                key={index}
+                label={th.props.fieldSettings[field].displayLabel}
+                fieldLabel={field}
+                type={th.props.fieldSettings[field].type}
+                enabled={
+                  th.props.perms.Update
+                    ? th.props.fieldSettings[field].editable
+                    : false
+                }
+                hasSaveBtn={true}
+                showIndicator={th.props.fieldSettings[field].editable}
+                value={th.props.values[field]}
+                onChange={th.updateHandle}
+                options={th.props.fieldSettings[field].options}
+                dateFormat={th.props.fieldSettings[field].dateFormat}
+                toolTip={th.props.fieldSettings[field].toolTip}
+              ></StdInput>
+            );
+          })}
+        </div>
+      );
   }
 }
 
@@ -122,18 +240,30 @@ export class Row extends React.Component {
   render() {
     return (
       <div>
-        <div className={this.state.rowClasses} style={{"--Columns": this.state.columns}}>{this.props.children}</div>
+        <div
+          className={this.state.rowClasses}
+          style={{ "--Columns": this.state.columns }}
+        >
+          {this.props.children}
+        </div>
       </div>
     );
   }
 }
 
 export class HeaderRow extends React.Component {
-  state={
+  state = {
     columns: React.Children.toArray(this.props.children).length,
-  }
+  };
   render() {
-    return <div className="tableRow headerRow" style={{"--Columns": this.state.columns}}>{this.props.children}</div>;
+    return (
+      <div
+        className="tableRow headerRow"
+        style={{ "--Columns": this.state.columns }}
+      >
+        {this.props.children}
+      </div>
+    );
   }
 }
 

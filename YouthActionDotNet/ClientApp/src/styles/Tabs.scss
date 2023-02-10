@@ -1,0 +1,45 @@
+@import "main.scss";
+
+.react-tabs {
+  display: flex;
+  width:100%;
+  color: $default;
+}
+.react-tabs__tab-list {
+  display: flex;
+  flex-direction: column;
+  width: 170px;
+  margin: 0;
+  padding: 0;
+  color: white;
+  // background: #3c3e43;
+}
+.react-tabs__tab {
+  height: 70px;
+  list-style: none;
+  padding: 12px 6px;
+  cursor: pointer;
+  color: $default;
+}
+.react-tabs__tab--selected {
+  background: $secondary;
+  border-color: $secondary;
+  border-left: 4px solid $primary;
+  color: white;
+}
+.react-tabs__tab-panel {
+    width:inherit;
+  display: none;
+}
+.react-tabs__tab-panel--selected {
+  display: block;
+}
+.react-tabs__tab {
+  padding-left: 24px;
+}
+.react-tabs__tab--selected {
+  padding-left: 21px;
+}
+.panel-content {
+  text-align: center;
+}
