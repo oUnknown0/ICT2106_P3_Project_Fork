@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YouthActionDotNet.Data;
 
-#nullable disable
 
 namespace YouthActionDotNet.Migrations
 {
