@@ -70,6 +70,9 @@ namespace YouthActionDotNet.Data{
             .HasOne(e => e.project)
             .WithMany()
             .HasForeignKey(e => e.ProjectId);
+
+                modelBuilder.Entity<Feedback>().ToTable("Feedback");
+
         }
         
     }
