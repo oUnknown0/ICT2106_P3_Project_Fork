@@ -92,31 +92,6 @@ namespace YouthActionDotNet.Migrations
                     b.ToTable("Expense", (string)null);
                 });
 
-            modelBuilder.Entity("YouthActionDotNet.Models.Feedback", b =>
-                {
-                    b.Property<string>("FeedbackId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FeedbackText")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ProjectName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Recommend")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Satisfaction")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("FeedbackId");
-
-                    b.ToTable("Feedback", (string)null);
-                });
-
             modelBuilder.Entity("YouthActionDotNet.Models.File", b =>
                 {
                     b.Property<string>("FileId")
