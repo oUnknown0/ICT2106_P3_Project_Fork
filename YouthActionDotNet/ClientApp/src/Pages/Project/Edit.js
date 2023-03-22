@@ -95,7 +95,7 @@ export default class Edit extends React.Component {
 //     });
 //   };
   delete = (data) =>{
-    window.location.href = `/Project/${data}`;
+    location.href = `/Project/${data}`;
   }
 
   handleUpdate = async (data) => {
