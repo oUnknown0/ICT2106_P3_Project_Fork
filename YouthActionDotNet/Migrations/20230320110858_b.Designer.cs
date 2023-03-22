@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YouthActionDotNet.Data;
 
@@ -10,25 +11,14 @@ using YouthActionDotNet.Data;
 namespace YouthActionDotNet.Migrations
 {
     [DbContext(typeof(DBContext))]
-    partial class DBContextModelSnapshot : ModelSnapshot
+    [Migration("20230320110858_b")]
+    partial class b
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.1");
-
-            modelBuilder.Entity("YouthActionDotNet.Models.Budget", b =>
-                {
-                    b.Property<string>("BudgetId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("ProjectBudget")
-                        .HasColumnType("REAL");
-
-                    b.HasKey("BudgetId");
-
-                    b.ToTable("Budget", (string)null);
-                });
 
             modelBuilder.Entity("YouthActionDotNet.Models.Donations", b =>
                 {
@@ -173,31 +163,36 @@ namespace YouthActionDotNet.Migrations
                     b.Property<string>("ProjectId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BudgetId")
+                    b.Property<double>("ProjectBudget")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("ProjectCompletionDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProjectDescription")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProjectEndDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ProjectName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProjectStartDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProjectStatus")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ServiceCenterId")
+                    b.Property<string>("ProjectType")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TimelineId")
+                    b.Property<string>("ServiceCenterId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ProjectId");
 
-                    b.HasIndex("BudgetId");
-
                     b.HasIndex("ServiceCenterId");
-
-                    b.HasIndex("TimelineId");
 
                     b.ToTable("Project", (string)null);
                 });
@@ -221,28 +216,6 @@ namespace YouthActionDotNet.Migrations
                     b.HasIndex("RegionalDirectorId");
 
                     b.ToTable("ServiceCenter", (string)null);
-                });
-
-            modelBuilder.Entity("YouthActionDotNet.Models.Timeline", b =>
-                {
-                    b.Property<string>("TimelineId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProjectCompletionDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProjectEndDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProjectStartDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProjectStatus")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("TimelineId");
-
-                    b.ToTable("Timeline", (string)null);
                 });
 
             modelBuilder.Entity("YouthActionDotNet.Models.User", b =>
@@ -418,23 +391,11 @@ namespace YouthActionDotNet.Migrations
 
             modelBuilder.Entity("YouthActionDotNet.Models.Project", b =>
                 {
-                    b.HasOne("YouthActionDotNet.Models.Budget", "Budget")
-                        .WithMany()
-                        .HasForeignKey("BudgetId");
-
                     b.HasOne("YouthActionDotNet.Models.ServiceCenter", "ServiceCenter")
                         .WithMany()
                         .HasForeignKey("ServiceCenterId");
 
-                    b.HasOne("YouthActionDotNet.Models.Timeline", "Timeline")
-                        .WithMany()
-                        .HasForeignKey("TimelineId");
-
-                    b.Navigation("Budget");
-
                     b.Navigation("ServiceCenter");
-
-                    b.Navigation("Timeline");
                 });
 
             modelBuilder.Entity("YouthActionDotNet.Models.ServiceCenter", b =>

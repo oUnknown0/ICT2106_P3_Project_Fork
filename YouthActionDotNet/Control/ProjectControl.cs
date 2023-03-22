@@ -137,21 +137,21 @@ namespace YouthActionDotNet.Control
             settings.ColumnSettings.Add("ProjectId", new ColumnHeader { displayHeader = "Project Id" });
             settings.ColumnSettings.Add("ProjectName", new ColumnHeader { displayHeader = "Project Name" });
             settings.ColumnSettings.Add("ProjectDescription", new ColumnHeader { displayHeader = "Project Description" });
-            settings.ColumnSettings.Add("ProjectStartDate", new ColumnHeader { displayHeader = "Project Start Date" });
-            settings.ColumnSettings.Add("ProjectEndDate", new ColumnHeader { displayHeader = "Project End Date" });
-            settings.ColumnSettings.Add("ProjectCompletionDate", new ColumnHeader { displayHeader = "Project Completion Date" });
+            // settings.ColumnSettings.Add("ProjectStartDate", new ColumnHeader { displayHeader = "Project Start Date" });
+            // settings.ColumnSettings.Add("ProjectEndDate", new ColumnHeader { displayHeader = "Project End Date" });
+            // settings.ColumnSettings.Add("ProjectCompletionDate", new ColumnHeader { displayHeader = "Project Completion Date" });
             settings.ColumnSettings.Add("ProjectStatus", new ColumnHeader { displayHeader = "Project Status" });
-            settings.ColumnSettings.Add("ProjectBudget", new ColumnHeader { displayHeader = "Project Budget" });
+            //settings.ColumnSettings.Add("ProjectBudget", new ColumnHeader { displayHeader = "Project Budget" });
             settings.ColumnSettings.Add("ServiceCenterId", new ColumnHeader { displayHeader = "Service Center Id" });
 
             settings.FieldSettings.Add("ProjectId", new InputType { type = "text", displayLabel = "Project Id", editable = false, primaryKey = true });
             settings.FieldSettings.Add("ProjectName", new InputType { type = "text", displayLabel = "Project Name", editable = true, primaryKey = false });
             settings.FieldSettings.Add("ProjectDescription", new InputType { type = "text", displayLabel = "Project Description", editable = true, primaryKey = false });
-            settings.FieldSettings.Add("ProjectStartDate", new InputType { type = "datetime", displayLabel = "Project Start Date", editable = true, primaryKey = false });
-            settings.FieldSettings.Add("ProjectEndDate", new InputType { type = "datetime", displayLabel = "Project End Date", editable = true, primaryKey = false });
-            settings.FieldSettings.Add("ProjectCompletionDate", new InputType { type = "datetime", displayLabel = "Project Completion Date", editable = true, primaryKey = false });
+            //settings.FieldSettings.Add("ProjectStartDate", new InputType { type = "datetime", displayLabel = "Project Start Date", editable = true, primaryKey = false });
+            //settings.FieldSettings.Add("ProjectEndDate", new InputType { type = "datetime", displayLabel = "Project End Date", editable = true, primaryKey = false });
+            //settings.FieldSettings.Add("ProjectCompletionDate", new InputType { type = "datetime", displayLabel = "Project Completion Date", editable = true, primaryKey = false });
             settings.FieldSettings.Add("ProjectStatus", new InputType { type = "text", displayLabel = "Project Status", editable = true, primaryKey = false });
-            settings.FieldSettings.Add("ProjectBudget", new InputType { type = "number", displayLabel = "Project Budget", editable = true, primaryKey = false });
+            //settings.FieldSettings.Add("ProjectBudget", new InputType { type = "number", displayLabel = "Project Budget", editable = true, primaryKey = false });
 
             var serviceCenters = ServiceCenterRepositoryOut.GetAll();
             settings.FieldSettings.Add("ServiceCenterId", new DropdownInputType
