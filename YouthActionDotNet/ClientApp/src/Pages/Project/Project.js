@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 export default class Project extends React.Component {
   state = {
@@ -189,7 +190,6 @@ export default class Project extends React.Component {
   }
 }
 
-import { useNavigate } from "react-router-dom";
 const ProjectTable = (props) => {
   const data = props.data;
   const deleteFn = props.delete;
@@ -232,6 +232,7 @@ const ProjectTable = (props) => {
     position: toast.POSITION.BOTTOM_CENTER,
   };
 
+  //When delete is clicked, all details of the project will be copied and stored in temporary variable.
   useEffect(() => {
     // setProjects(data);
     const projectsCopy = [...data];
@@ -301,6 +302,7 @@ const ProjectTable = (props) => {
       // console.log(projects.length)
     }
   }, [projects]);
+  //Toast Message is created to allow users to undo deletion of project
   const notify = () => {
     toast.info(undoToastBtn, options);
   };
@@ -338,64 +340,84 @@ const ProjectTable = (props) => {
   console.log(projects);
   return (
     <>
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th onClick={() => applySorting("ProjectName", !sorting.ascending)}>
-            Project Name
-          </th>
-          <th
-            colSpan={2}
-            onClick={() =>
-              applySorting("ProjectDescription", !sorting.ascending)
-            }
-          >
-            Project Description
-          </th>
-          <th onClick={() => applySorting("ProjectBudget", !sorting.ascending)}>
-            Project Budget
-          </th>
-          <th
-            onClick={() => applySorting("ProjectStartDate", !sorting.ascending)}
-          >
-            Start Date
-          </th>
-          <th
-            onClick={() => applySorting("ProjectEndDate", !sorting.ascending)}
-          >
-            End Date
-          </th>
-          <th onClick={() => applySorting("ProjectStatus", !sorting.ascending)}>
-            Project Status
-          </th>
-          <th></th>
-        </tr>
-      </thead>
-      {projects.map((item, key) => {
-        return (
-          <tbody key={key}>
-            <tr>
-              <td>{key + 1}</td>
-              <td>{item.ProjectName}</td>
-              <td colSpan={2}>{item.ProjectDescription}</td>
-              <td>{item.ProjectBudget}</td>
-              <td>{item.ProjectStartDate}</td>
-              <td>{item.ProjectEndDate}</td>
-              <td>{item.ProjectStatus}</td>
-              <td>
-                <button onClick={() => routeChange(item.ProjectId)}>
-                  View
-                </button>
-                {/* <button onClick={() => setUndo(true)}>Undo</button> */}
-              </td>
-            </tr>
-          </tbody>
-        );
-      })}
-     
-    </Table>
-     <ToastContainer theme="dark" /></>
-    
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onClick={() => applySorting("ProjectName", !sorting.ascending)}>
+              Project Name
+            </th>
+            <th
+              colSpan={2}
+              onClick={() =>
+                applySorting("ProjectDescription", !sorting.ascending)
+              }
+            >
+              Project Description
+            </th>
+
+            <th
+              onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
+            >
+              Project Budget
+            </th>
+            <th
+              onClick={() =>
+                applySorting("ProjectStartDate", !sorting.ascending)
+              }
+            >
+              Start Date
+            </th>
+            <th
+              onClick={() => applySorting("ProjectEndDate", !sorting.ascending)}
+            >
+              End Date
+            </th>
+            <th
+              onClick={() => applySorting("ProjectStatus", !sorting.ascending)}
+            >
+              Project Status
+            </th>
+          </tr>
+        </thead>
+        {projects.map((item, key) => {
+          return (
+            <tbody key={key}>
+              <tr>
+                <td>{key + 1}</td>
+                <td>{item.ProjectName}</td>
+                <td colSpan={2}>
+                  <>
+                    {item.ProjectDescription}
+                    {/* {JSON.parse(item.ProjectType || "[]")?.length > 0 ? (
+                      <div className="mt-2">
+                        <b>Volunteers: </b>
+                        {JSON.parse(item.ProjectType || "[]")?.map((item) => (
+                          <span>
+                            {item?.username} <span></span>
+                          </span>
+                        )) || "N/A"}
+                      </div>
+                    ) : null} */}
+                  </>
+                </td>
+
+                <td>{item.ProjectBudget}</td>
+                <td>{item.ProjectStartDate}</td>
+                <td>{item.ProjectEndDate}</td>
+                <td>{item.ProjectStatus}</td>
+                <td>
+                  <button onClick={() => routeChange(item.ProjectId)}>
+                    View
+                  </button>
+                  {/* <button onClick={() => setUndo(true)}>Undo</button> */}
+                </td>
+              </tr>
+            </tbody>
+          );
+        })}
+      </Table>
+      <ToastContainer theme="dark" />
+    </>
   );
 };
