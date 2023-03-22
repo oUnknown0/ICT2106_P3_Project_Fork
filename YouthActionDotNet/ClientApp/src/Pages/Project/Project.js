@@ -314,12 +314,12 @@ const ProjectTable = (props) => {
         const proj = {
           ProjectName: projRef[0].ProjectName,
           ProjectDescription: projRef[0].ProjectDescription,
-          //ProjectBudget: projRef[0].Budget.ActualExpenses,
-          ProjectStartDate: projRef[0].Timeline.StartDate,
-          ProjectEndDate: projRef[0].Timeline.EndDate,
+          ProjectBudget: projRef[0].ProjectBudget,
+          ProjectStartDate: projRef[0].ProjectStartDate,
+          ProjectEndDate: projRef[0].ProjectEndDate,
           ProjectStatus: projRef[0].ProjectStatus,
-          ProjectCompletionDate: projRef[0].Timeline.CompletionDate,
-          //ProjectType: projRef[0].ProjectType,
+          ProjectCompletionDate: projRef[0].ProjectCompletionDate,
+          ProjectType: projRef[0].ProjectType,
           ServiceCenterId: projRef[0].ServiceCenterId,
         };
         console.log(proj);
@@ -355,20 +355,20 @@ const ProjectTable = (props) => {
           >
             Project Description
           </th>
-          {/* <th onClick={() => applySorting("ProjectBudget", !sorting.ascending)}>
+          <th onClick={() => applySorting("ProjectBudget", !sorting.ascending)}>
             Project Budget
-          </th> */}
+          </th>
           <th
-            onClick={() => applySorting("StartDate", !sorting.ascending)}
+            onClick={() => applySorting("ProjectStartDate", !sorting.ascending)}
           >
             Start Date
           </th>
           <th
-            onClick={() => applySorting("EndDate", !sorting.ascending)}
+            onClick={() => applySorting("ProjectEndDate", !sorting.ascending)}
           >
             End Date
           </th>
-          <th onClick={() => applySorting("Status", !sorting.ascending)}>
+          <th onClick={() => applySorting("ProjectStatus", !sorting.ascending)}>
             Project Status
           </th>
           <th></th>
@@ -381,9 +381,9 @@ const ProjectTable = (props) => {
               <td>{key + 1}</td>
               <td>{item.ProjectName}</td>
               <td colSpan={2}>{item.ProjectDescription}</td>
-              {/* <td>{item.Budget.ActualExpenses}</td> */}
-              <td>{item.Timeline.StartDate}</td>
-              <td>{item.Timeline.EndDate}</td>
+              <td>{item.ProjectBudget}</td>
+              <td>{item.ProjectStartDate}</td>
+              <td>{item.ProjectEndDate}</td>
               <td>{item.ProjectStatus}</td>
               <td>
                 <button onClick={() => routeChange(item.ProjectId)}>
