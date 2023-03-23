@@ -34,6 +34,7 @@ import VolunteerHome from "./Pages/Volunteer/volunteerHome"
 
 import Sample from './Pages/Sample';
 import Edit from './Pages/Project/Edit';
+import FeedbackForm from './Pages/Feedback/FeedbackForm';
 
 
 /* function getToken() {  
@@ -74,6 +75,7 @@ export default function App() {
               <DrawerSection label={"Modules"}>
                 <DrawerItem label="Dashboard" to={"/"} logo={homeImg}></DrawerItem>
                 <DrawerItem label="Volunteer Registration" to={"volunteer-registration"} logo={homeImg}></DrawerItem>
+                <DrawerItem label="Feedback Form" to={"feedback-form"} logo={homeImg}></DrawerItem>
               </DrawerSection>
             </SlideDrawer>
             {backdrop}
@@ -81,6 +83,7 @@ export default function App() {
               <Route path="/" element={
                 <Login setToken={setToken} setPerms={setPerms}></Login>}></Route>
               <Route path="/Register" element={<Register />}></Route>
+              <Route path="/feedback-form" element={<FeedbackForm/>}/>
               <Route path="/volunteer-registration" element={<VolunteerRegistration setToken={setToken} setPerms={setPerms}/>}></Route>
             </Routes>
           </div>
@@ -161,6 +164,7 @@ export default function App() {
               <Route path="/Service-Center" element={<ServiceCenters user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Project" element={<Project user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Project/:id" element={<Project user={token} permissions = {parsedPerms}/>}/>
+              <Route path="/Project/Edit/:id" element={<Edit user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Project/Edit/:id" element={<Edit user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Expenses" element={<Expense user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Permissions" element={<Permissions user={token} permissions = {parsedPerms}/>}/>
