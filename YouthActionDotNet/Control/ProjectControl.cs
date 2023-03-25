@@ -18,6 +18,8 @@ namespace YouthActionDotNet.Control
         private GenericRepositoryOut<Project> ProjectRepositoryOut;
         private GenericRepositoryIn<ServiceCenter> ServiceCenterRepositoryIn;
         private GenericRepositoryOut<ServiceCenter> ServiceCenterRepositoryOut;
+        private GenericRepositoryIn<Timeline> TimelineRepositoryIn;
+        private GenericRepositoryIn<Budget> BudgetRepositoryIn;
         //-------------------------------------------------TO BE UPDATED------------------------------------------------//
         private ProjectRepositoryIn ProjectsRepositoryIn;
         private ProjectRepositoryOut ProjectsRepositoryOut;
@@ -34,6 +36,8 @@ namespace YouthActionDotNet.Control
             ProjectRepositoryOut = new GenericRepositoryOut<Project>(context);
             ServiceCenterRepositoryIn = new GenericRepositoryIn<ServiceCenter>(context);
             ServiceCenterRepositoryOut = new GenericRepositoryOut<ServiceCenter>(context);
+            TimelineRepositoryIn = new GenericRepositoryIn<Timeline>(context);
+            BudgetRepositoryIn = new GenericRepositoryIn<Budget>(context);
         }
 
         public bool Exists(string id)
@@ -44,6 +48,14 @@ namespace YouthActionDotNet.Control
         public async Task<ActionResult<string>> Create(Project template)
         {
 
+            Timeline timeline = new Timeline();
+            Budget budget = new Budget();
+            template.TimelineId = timeline.TimelineId;
+            template.BudgetId = budget.BudgetId;
+            template.Timeline = timeline;
+            template.Budget = budget;
+            await TimelineRepositoryIn.InsertAsync(timeline);
+            await BudgetRepositoryIn.InsertAsync(budget);
             var project = await ProjectRepositoryIn.InsertAsync(template);
             return JsonConvert.SerializeObject(new { success = true, message = "Project Created", data = project }, settings);
         }
@@ -114,6 +126,8 @@ namespace YouthActionDotNet.Control
             {
                 return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
             }
+            await BudgetRepositoryIn.DeleteAsync(project.BudgetId);
+            await TimelineRepositoryIn.DeleteAsync(project.TimelineId);
             await ProjectRepositoryIn.DeleteAsync(id);
             return JsonConvert.SerializeObject(new { success = true, data = "", message = "Project Successfully Deleted" });
         }
@@ -125,6 +139,8 @@ namespace YouthActionDotNet.Control
             {
                 return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
             }
+            await BudgetRepositoryIn.DeleteAsync(template.BudgetId);
+            await TimelineRepositoryIn.DeleteAsync(template.TimelineId);
             await ProjectRepositoryIn.DeleteAsync(template);
             return JsonConvert.SerializeObject(new { success = true, data = "", message = "Project Successfully Deleted" });
         }
