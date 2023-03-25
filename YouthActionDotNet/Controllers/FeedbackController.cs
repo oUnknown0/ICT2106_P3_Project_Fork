@@ -16,67 +16,67 @@ namespace YouthActionDotNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectController : ControllerBase, IUserInterfaceCRUD<Project>
+    public class FeedbackController : ControllerBase, IUserInterfaceCRUD<Feedback>
     {
-        private ProjectControl projectControl;
+        private FeedbackControl FeedbackControl;
         JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
-        public ProjectController(DBContext context)
+        public FeedbackController(DBContext context)
         {
-            projectControl = new ProjectControl(context);
+            FeedbackControl = new FeedbackControl(context);
         }
 
         public bool Exists(string id)
         {
-            return projectControl.Get(id) != null;
+            return FeedbackControl.Get(id) != null;
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult<string>> Create(Project template)
+        public async Task<ActionResult<string>> Create(Feedback template)
         {
-            return await projectControl.Create(template);
+            return await FeedbackControl.Create(template);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<string>> Get(string id)
         {
-            return await projectControl.Get(id);
+            return await FeedbackControl.Get(id);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<string>> Update(string id, Project template)
+        public async Task<ActionResult<string>> Update(string id, Feedback template)
         {
-            return await projectControl.Update(id, template);
+            return await FeedbackControl.Update(id, template);
         }
 
         [HttpPut("UpdateAndFetch/{id}")]
-        public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Project template)
+        public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Feedback template)
         {
-            return await projectControl.UpdateAndFetchAll(id, template);
+            return await FeedbackControl.UpdateAndFetchAll(id, template);
         }
 
         [HttpDelete("Delete/{id}")]
         public async Task<ActionResult<string>> Delete(string id)
         {
-            return await projectControl.Delete(id);
+            return await FeedbackControl.Delete(id);
         }
 
         [HttpDelete("Delete")]
-        public async Task<ActionResult<string>> Delete(Project template)
+        public async Task<ActionResult<string>> Delete(Feedback template)
         {
-            return await projectControl.Delete(template);
+            return await FeedbackControl.Delete(template);
         }
 
         [HttpGet("All")]
         public async Task<ActionResult<string>> All()
         {
-            return await projectControl.All();
+            return await FeedbackControl.All();
         }
 
         [HttpGet("Settings")]
         public string Settings()
         {
-            return projectControl.Settings();
+            return FeedbackControl.Settings();
         }
     }
 }

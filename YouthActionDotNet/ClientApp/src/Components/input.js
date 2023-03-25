@@ -1070,7 +1070,7 @@ class StdDropDownBox extends React.Component {
           defaultValue = {this.props.allowEmpty ? "" : this.props.options[0].value}
           required={this.props.required}
         >
-          {this.props.allowEmpty ? <option className="emptyDefault" value=""></option> : ""}
+          {this.props.allowEmpty ? <option className="emptyDefault" value={null}></option> : ""}
           {this.props.options.map((option,index) => {
             return <option 
             className="dropdownOptions" 

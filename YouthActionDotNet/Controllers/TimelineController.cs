@@ -16,14 +16,14 @@ namespace YouthActionDotNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectController : ControllerBase, IUserInterfaceCRUD<Project>
+    public class TimelineController : ControllerBase, IUserInterfaceCRUD<Timeline>
     {
-        private ProjectControl projectControl;
+        private TimelineControl projectControl;
         JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
-        public ProjectController(DBContext context)
+        public TimelineController(DBContext context)
         {
-            projectControl = new ProjectControl(context);
+            projectControl = new TimelineControl(context);
         }
 
         public bool Exists(string id)
@@ -32,7 +32,7 @@ namespace YouthActionDotNet.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult<string>> Create(Project template)
+        public async Task<ActionResult<string>> Create(Timeline template)
         {
             return await projectControl.Create(template);
         }
@@ -44,13 +44,13 @@ namespace YouthActionDotNet.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<string>> Update(string id, Project template)
+        public async Task<ActionResult<string>> Update(string id, Timeline template)
         {
             return await projectControl.Update(id, template);
         }
 
         [HttpPut("UpdateAndFetch/{id}")]
-        public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Project template)
+        public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Timeline template)
         {
             return await projectControl.UpdateAndFetchAll(id, template);
         }
@@ -62,7 +62,7 @@ namespace YouthActionDotNet.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task<ActionResult<string>> Delete(Project template)
+        public async Task<ActionResult<string>> Delete(Timeline template)
         {
             return await projectControl.Delete(template);
         }

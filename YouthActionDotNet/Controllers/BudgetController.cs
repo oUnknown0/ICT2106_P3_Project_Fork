@@ -16,14 +16,14 @@ namespace YouthActionDotNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProjectController : ControllerBase, IUserInterfaceCRUD<Project>
+    public class BudgetController : ControllerBase, IUserInterfaceCRUD<Budget>
     {
-        private ProjectControl projectControl;
+        private BudgetControl projectControl;
         JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
-        public ProjectController(DBContext context)
+        public BudgetController(DBContext context)
         {
-            projectControl = new ProjectControl(context);
+            projectControl = new BudgetControl(context);
         }
 
         public bool Exists(string id)
@@ -32,7 +32,7 @@ namespace YouthActionDotNet.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<ActionResult<string>> Create(Project template)
+        public async Task<ActionResult<string>> Create(Budget template)
         {
             return await projectControl.Create(template);
         }
@@ -44,13 +44,13 @@ namespace YouthActionDotNet.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<string>> Update(string id, Project template)
+        public async Task<ActionResult<string>> Update(string id, Budget template)
         {
             return await projectControl.Update(id, template);
         }
 
         [HttpPut("UpdateAndFetch/{id}")]
-        public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Project template)
+        public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Budget template)
         {
             return await projectControl.UpdateAndFetchAll(id, template);
         }
@@ -62,7 +62,7 @@ namespace YouthActionDotNet.Controllers
         }
 
         [HttpDelete("Delete")]
-        public async Task<ActionResult<string>> Delete(Project template)
+        public async Task<ActionResult<string>> Delete(Budget template)
         {
             return await projectControl.Delete(template);
         }

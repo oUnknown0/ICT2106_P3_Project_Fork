@@ -19,6 +19,10 @@ import Volunteer from './Pages/Volunteer/Volunteer';
 import VolunteerRegistration from './Pages/Volunteer/VolunteerRegistration';
 import Donors from './Pages/Donor/Donor';
 import Donations from './Pages/Donor/Donations';
+import DonorDashboard from './Pages/Donor/DonorDashboard';
+import Donate from './Pages/Donor/Donate';
+import DonorHistory from './Pages/Donor/DonorHistory';
+import DonorAvailableProjects from './Pages/Donor/DonorAvailableProjects';
 import ServiceCenters from './Pages/Employee/ServiceCenters';
 import VolunteerWork from './Pages/Volunteer/VolunteerWork';
 import Project from './Pages/Project/Project';
@@ -29,6 +33,7 @@ import Home  from "./Pages/Home"
 import VolunteerHome from "./Pages/Volunteer/volunteerHome"
 
 import Sample from './Pages/Sample';
+import Edit from './Pages/Project/Edit';
 
 
 /* function getToken() {  
@@ -109,7 +114,8 @@ export default function App() {
                 <Route path="/" element={<Home user={token} permissions = {parsedPerms}/>}/>
               }
               {token.data.Role == "Donor" &&
-                <Route path="/" element={<Home user={token} permissions = {parsedPerms}/>}/>
+                <Route path="/" element={<DonorDashboard user={token} permissions = {parsedPerms}/>}/>
+             
               }
               {token.data.Role == "Volunteer" &&
                 <Route path="/" element={<VolunteerHome user={token} permissions = {parsedPerms}/>}/>
@@ -147,9 +153,15 @@ export default function App() {
               <Route path="/volunteer-Registration" element={<VolunteerRegistration user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Donors" element={<Donors user={token} permissions = {parsedPerms}></Donors>}/>
               <Route path="/Donations" element={<Donations user={token} permissions = {parsedPerms}></Donations>}/>
+              <Route path="/DonorDashboard" element={<DonorDashboard user={token} permissions = {parsedPerms}></DonorDashboard>}/>
+              <Route path="/DonorHistory" element={<DonorHistory user={token} permissions = {parsedPerms}></DonorHistory>}/>
+              <Route path="/DonorAvailableProjects" element={<DonorAvailableProjects user={token} permissions = {parsedPerms}></DonorAvailableProjects>}/>
+              <Route path="/Donate" element={<Donate user={token} permissions = {parsedPerms}></Donate>}/>
               <Route path="/Volunteer-Work" element={<VolunteerWork user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Service-Center" element={<ServiceCenters user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Project" element={<Project user={token} permissions = {parsedPerms}/>}/>
+              <Route path="/Project/:id" element={<Project user={token} permissions = {parsedPerms}/>}/>
+              <Route path="/Project/Edit/:id" element={<Edit user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Expenses" element={<Expense user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Permissions" element={<Permissions user={token} permissions = {parsedPerms}/>}/>
               <Route path="/Sample" element={<Sample user={token} permissions = {parsedPerms}/>}/>
