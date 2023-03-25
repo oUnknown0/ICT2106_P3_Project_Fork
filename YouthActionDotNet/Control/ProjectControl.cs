@@ -18,11 +18,18 @@ namespace YouthActionDotNet.Control
         private GenericRepositoryOut<Project> ProjectRepositoryOut;
         private GenericRepositoryIn<ServiceCenter> ServiceCenterRepositoryIn;
         private GenericRepositoryOut<ServiceCenter> ServiceCenterRepositoryOut;
-
+        //-------------------------------------------------TO BE UPDATED------------------------------------------------//
+        private ProjectRepositoryIn ProjectsRepositoryIn;
+        private ProjectRepositoryOut ProjectsRepositoryOut;
+        //-------------------------------------------------TO BE UPDATED------------------------------------------------//
         JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
         public ProjectControl(DBContext context)
         {
+            //-------------------------------------------------TO BE UPDATED------------------------------------------------//
+            ProjectsRepositoryIn = new ProjectRepositoryIn(context);
+            ProjectsRepositoryOut = new ProjectRepositoryOut(context);
+            //-------------------------------------------------TO BE UPDATED------------------------------------------------//
             ProjectRepositoryIn = new GenericRepositoryIn<Project>(context);
             ProjectRepositoryOut = new GenericRepositoryOut<Project>(context);
             ServiceCenterRepositoryIn = new GenericRepositoryIn<ServiceCenter>(context);
@@ -127,6 +134,120 @@ namespace YouthActionDotNet.Control
             var projects = await ProjectRepositoryOut.GetAllAsync();
             return JsonConvert.SerializeObject(new { success = true, data = projects, message = "Projects Successfully Retrieved" });
         }
+
+
+        //------------------------------------------------------TO BE UPDATED---------------------------------------------------//
+        public async Task<ActionResult<string>> GetProjectByTag(string tag)
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectByTag(tag);
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Tag Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Tag Successfully Retrieved" }, settings);
+        }
+        public async Task<ActionResult<string>> GetProjectInProgress()
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectInProgress();
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Test Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Test Successfully Retrieved" }, settings);
+        }
+        public async Task<ActionResult<string>> GetProjectPinned()
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectPinned();
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Test Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Test Successfully Retrieved" }, settings);
+        }
+        public async Task<ActionResult<string>> GetProjectArchived()
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectArchived();
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Test Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Test Successfully Retrieved" }, settings);
+        }
+
+        public async Task<ActionResult<string>> UpdateStatusToPinned(string id, Project template)
+        {
+            if (id != template.ProjectId)
+            {
+                return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Id Mismatch" });
+            }
+            await ProjectsRepositoryIn.UpdateStatusToPinned(template);
+            try
+            {
+                return JsonConvert.SerializeObject(new { success = true, data = template, message = "Project Successfully Updated" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Exists(id))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        public async Task<ActionResult<string>> UpdateStatusToArchive(string id, Project template)
+        {
+            if (id != template.ProjectId)
+            {
+                return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Id Mismatch" });
+            }
+            await ProjectsRepositoryIn.UpdateStatusToArchive(template);
+            try
+            {
+                return JsonConvert.SerializeObject(new { success = true, data = template, message = "Project Successfully Updated" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Exists(id))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+
+        public async Task<ActionResult<string>> UpdateStatusToInProgress(string id, Project template)
+        {
+            if (id != template.ProjectId)
+            {
+                return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Id Mismatch" });
+            }
+            await ProjectsRepositoryIn.UpdateStatusToInProgress(template);
+            try
+            {
+                return JsonConvert.SerializeObject(new { success = true, data = template, message = "Project Successfully Updated" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Exists(id))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        //------------------------------------------------------TO BE UPDATED---------------------------------------------------//
 
         public string Settings()
         {
