@@ -24,7 +24,7 @@ namespace YouthActionDotNet.Models
 
         public string ProjectStatus { get; set; }
 
-        public string ProjectType { get; set; }
+        public string ProjectVolunteer { get; set; }
 
         // public double ProjectBudget { get; set; }
 

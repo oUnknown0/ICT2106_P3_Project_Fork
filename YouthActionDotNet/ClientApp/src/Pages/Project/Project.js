@@ -739,13 +739,12 @@ const DisplayTables = (props) => {
         const proj = {
           ProjectName: projRef[0].ProjectName,
           ProjectDescription: projRef[0].ProjectDescription,
-          ProjectType: projRef[0].ProjectType,
           ProjectBudget: projRef[0].ProjectBudget,
           ProjectStartDate: projRef[0].ProjectStartDate,
           ProjectEndDate: projRef[0].ProjectEndDate,
           ProjectStatus: projRef[0].ProjectStatus,
           ProjectCompletionDate: projRef[0].ProjectCompletionDate,
-          ProjectType: projRef[0].ProjectType,
+          ProjectVolunteer: projRef[0].ProjectVolunteer,
           ServiceCenterId: projRef[0].ServiceCenterId,
         };
         console.log(proj);
@@ -812,7 +811,7 @@ const ProjectTable = (props) => {
             >
               Project Description
             </th>
-            <th onClick={() => applySorting("ProjectType", !sorting.ascending)}>
+            <th onClick={() => applySorting("ProjectVolunteer", !sorting.ascending)}>
               Project Type
             </th>
             <th
@@ -848,10 +847,10 @@ const ProjectTable = (props) => {
                 <td colSpan={2}>
                   <>
                     {item.ProjectDescription}
-                    {/* {JSON.parse(item.ProjectType || "[]")?.length > 0 ? (
+                    {/* {JSON.parse(item.ProjectVolunteer || "[]")?.length > 0 ? (
                       <div className="mt-2">
                         <b>Volunteers: </b>
-                        {JSON.parse(item.ProjectType || "[]")?.map((item) => (
+                        {JSON.parse(item.ProjectVolunteer || "[]")?.map((item) => (
                           <span>
                             {item?.username} <span></span>
                           </span>
@@ -860,7 +859,7 @@ const ProjectTable = (props) => {
                     ) : null} */}
                   </>
                 </td>
-                <td>{item.ProjectType}</td>
+                <td>{item.ProjectVolunteer}</td>
                 <td>{item.ProjectBudget}</td>
                 <td>{item.ProjectStartDate}</td>
                 <td>{item.ProjectEndDate}</td>
@@ -1005,13 +1004,13 @@ const PinnedProjectTable = (props) => {
         const proj = {
           ProjectName: projRef[0].ProjectName,
           ProjectDescription: projRef[0].ProjectDescription,
-          ProjectType: projRef[0].ProjectType,
+          ProjectVolunteer: projRef[0].ProjectVolunteer,
           ProjectBudget: projRef[0].ProjectBudget,
           ProjectStartDate: projRef[0].ProjectStartDate,
           ProjectEndDate: projRef[0].ProjectEndDate,
           ProjectStatus: projRef[0].ProjectStatus,
           ProjectCompletionDate: projRef[0].ProjectCompletionDate,
-          ProjectType: projRef[0].ProjectType,
+          ProjectVolunteer: projRef[0].ProjectVolunteer,
           ServiceCenterId: projRef[0].ServiceCenterId,
         };
         console.log(proj);
@@ -1047,7 +1046,7 @@ const PinnedProjectTable = (props) => {
             >
               Project Description
             </th>
-            <th onClick={() => applySorting("ProjectType", !sorting.ascending)}>
+            <th onClick={() => applySorting("ProjectVolunteer", !sorting.ascending)}>
               Project Type
             </th>
             <th
@@ -1083,10 +1082,10 @@ const PinnedProjectTable = (props) => {
                 <td colSpan={2}>
                   <>
                     {item.ProjectDescription}
-                    {/* {JSON.parse(item.ProjectType || "[]")?.length > 0 ? (
+                    {/* {JSON.parse(item.ProjectVolunteer || "[]")?.length > 0 ? (
                       <div className="mt-2">
                         <b>Volunteers: </b>
-                        {JSON.parse(item.ProjectType || "[]")?.map((item) => (
+                        {JSON.parse(item.ProjectVolunteer || "[]")?.map((item) => (
                           <span>
                             {item?.username} <span></span>
                           </span>
@@ -1245,7 +1244,7 @@ const ArchivedTable = (props) => {
           ProjectEndDate: projRef[0].ProjectEndDate,
           ProjectStatus: projRef[0].ProjectStatus,
           ProjectCompletionDate: projRef[0].ProjectCompletionDate,
-          ProjectType: projRef[0].ProjectType,
+          ProjectVolunteer: projRef[0].ProjectVolunteer,
           ServiceCenterId: projRef[0].ServiceCenterId,
         };
         console.log(proj);
@@ -1315,10 +1314,10 @@ const ArchivedTable = (props) => {
                 <td colSpan={2}>
                   <>
                     {item.ProjectDescription}
-                    {/* {JSON.parse(item.ProjectType || "[]")?.length > 0 ? (
+                    {/* {JSON.parse(item.ProjectVolunteer || "[]")?.length > 0 ? (
                       <div className="mt-2">
                         <b>Volunteers: </b>
-                        {JSON.parse(item.ProjectType || "[]")?.map((item) => (
+                        {JSON.parse(item.ProjectVolunteer || "[]")?.map((item) => (
                           <span>
                             {item?.username} <span></span>
                           </span>
