@@ -9,6 +9,202 @@ import { Overlay } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router";
+import { Chart } from 'chart.js';
+import * as d3 from 'd3';
+import cloud from 'd3-cloud';
+
+//feedback charts for satisfaction and recommend
+const FeedbackCharts = ({ satisfactionData, recommendData }) => {
+  const satisfactionChartRef = useRef(null);
+  const recommendChartRef = useRef(null);
+
+  const generateSatisfactionChartData = (data) => {
+    const labels = [
+      'Very unsatisfied',
+      'Somewhat unsatisfied',
+      'Neutral',
+      'Somewhat satisfied',
+      'Very satisfied',
+    ];
+    const counts = [0, 0, 0, 0, 0];
+
+    data.forEach((satisfaction) => {
+      counts[satisfaction - 1]++;
+    });
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Satisfaction',
+          data: counts,
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(255, 159, 64, 0.2)',
+            'rgba(255, 205, 86, 0.2)',
+            'rgba(75, 192, 192, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(255, 205, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(54, 162, 235, 1)',
+          ],
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+
+  const generateRecommendChartData = (data) => {
+    const labels = ['Yes', 'No'];
+    const counts = [0, 0];
+
+    data.forEach((recommend) => {
+      counts[recommend ? 0 : 1]++;
+    });
+
+    return {
+      labels,
+      datasets: [
+        {
+          data: counts,
+          backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+          borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+
+  useEffect(() => {
+    if (satisfactionChartRef.current && recommendChartRef.current) {
+      const satisfactionChart = new Chart(satisfactionChartRef.current, {
+        type: 'bar',
+        data: generateSatisfactionChartData(satisfactionData),
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      const recommendChart = new Chart(recommendChartRef.current, {
+        type: 'pie',
+        data: generateRecommendChartData(recommendData),
+        options: {
+          height: 20,
+          width: 20
+        }
+      });
+
+
+      return () => {
+        satisfactionChart.destroy();
+        recommendChart.destroy();
+      };
+    }
+  }, [satisfactionChartRef, recommendChartRef, satisfactionData, recommendData]);
+
+  return (
+    <div style={{ display: 'flex' }}>
+      <div style={{ flex: 1, marginLeft: '50px', marginRight: '50px' }}>
+        <h3>Satisfaction Data</h3>
+        <canvas ref={satisfactionChartRef} />
+      </div>
+      <div style={{ flex: 1, marginLeft: '20px', height: '360px', width: '767px' }}>
+        <h3>Recommend Data</h3>
+        <canvas ref={recommendChartRef} />
+      </div>
+    </div>
+
+  );
+};
+
+//feedback word cloud for feedback text
+const FeedbackWordCloud = ({ feedbackTextData }) => {
+  const svgRef = useRef();
+  const [wordArray, setWordArray] = useState([]);
+
+  useEffect(() => {
+    const allFeedbackText = Object.values(feedbackTextData).flat();
+
+    const words = allFeedbackText.reduce((acc, feedbackText) => {
+      const wordsInText = feedbackText.split(/\s+/);
+      wordsInText.forEach((word) => {
+        const cleanedWord = word.replace(/[^\w]/g, '').toLowerCase();
+        if (cleanedWord) {
+          if (acc[cleanedWord]) {
+            acc[cleanedWord]++;
+          } else {
+            acc[cleanedWord] = 1;
+          }
+        }
+      });
+      return acc;
+    }, {});
+
+    const newWordArray = Object.keys(words).map((word) => {
+      return { text: word, size: words[word] * 20 };
+    });
+
+    setWordArray(newWordArray);
+  }, [feedbackTextData]);
+
+
+  useEffect(() => {
+    if (!wordArray.length) {
+      return;
+    }
+    const drawWordCloud = (words) => {
+      const width = 1580;
+      const height = 160;
+
+      const svg = d3.select(svgRef.current);
+      svg.attr('width', width).attr('height', height);
+
+      const layout = cloud()
+        .size([width, height])
+        .words(words)
+        .padding(5)
+        .rotate(() => (Math.random() - 0.5) * 90)
+        .fontSize((d) => d.size)
+        .on('end', draw);
+
+      layout.start();
+
+      function draw(words) {
+        svg.selectAll('g').remove(); // Clear the previous words
+
+        svg
+          .append('g')
+          .attr('transform', `translate(${layout.size()[0] / 2 + 60}, ${layout.size()[1] / 2})`)
+          .selectAll('text')
+          .data(words)
+          .enter()
+          .append('text')
+          .style('font-size', (d) => `${d.size}px`)
+          .style('fill', () => `hsl(${Math.random() * 360}, 100%, 50%)`)
+          .attr('text-anchor', 'middle')
+          .attr('transform', (d) => `translate(${[d.x, d.y]})`) // Removed rotation
+          .text((d) => d.text);
+      }
+
+    };
+
+    drawWordCloud(wordArray);
+  }, [wordArray]);
+
+  return (
+    <div>
+      <svg ref={svgRef}></svg>
+    </div>
+  );
+};
 
 export default class View extends React.Component {
   state = {
@@ -18,6 +214,9 @@ export default class View extends React.Component {
     settings: {},
     volunteer: [],
     selectedVolunteer: [],
+    satisfactionData: {},
+    recommendData: {},
+    feedbackTextData: {},
     error: "",
   };
 
@@ -66,6 +265,80 @@ export default class View extends React.Component {
         settings: settings,
       });
     });
+
+    //retrieving feedback data
+    const feedbackApi = "/api/Feedback/All";
+    fetch(feedbackApi)
+      .then((response) => response.json())
+      .then((feedback) => {
+        console.log("Fetched data: ", feedback);
+        const feedbackData = feedback.data.map((feedbackItem) => {
+          return {
+            feedbackId: feedbackItem.FeedbackId,
+            projectName: feedbackItem.ProjectName,
+            satisfaction: feedbackItem.Satisfaction,
+            recommend: feedbackItem.Recommend,
+            feedbackText: feedbackItem.FeedbackText
+          };
+        });
+        console.log(feedbackData);
+
+        //retrieving satisfaction data
+        const satisfactionData = {};
+        feedbackData.forEach((feedbackItem) => {
+          const projectName = feedbackItem.projectName;
+          const satisfaction = feedbackItem.satisfaction;
+          if (!satisfactionData[projectName]) {
+            satisfactionData[projectName] = [satisfaction];
+          } else {
+            satisfactionData[projectName].push(satisfaction);
+          }
+        });
+
+        //retrieving recommend data
+        const recommendData = {};
+        feedbackData.forEach((feedbackItem) => {
+          const projectName = feedbackItem.projectName;
+          const recommend = feedbackItem.recommend;
+          if (!recommendData[projectName]) {
+            recommendData[projectName] = [recommend];
+          } else {
+            recommendData[projectName].push(recommend);
+          }
+        });
+
+        //checking the details for the recommend data for each project
+        Object.entries(recommendData).forEach(([projectName, projectRecommendData]) => {
+          console.log(`Project name: ${projectName}, Recommend data:`, projectRecommendData);
+        });
+
+        //retrieving feedback text data
+        const feedbackTextData = {};
+        feedbackData.forEach((feedbackItem) => {
+          const projectName = feedbackItem.projectName;
+          const feedbackText = feedbackItem.feedbackText;
+          if (!feedbackTextData[projectName]) {
+            feedbackTextData[projectName] = [feedbackText];
+          } else {
+            feedbackTextData[projectName].push(feedbackText);
+          }
+        });
+
+        // Set the processed data to the component state
+        this.setState({
+          satisfactionData: satisfactionData,
+          recommendData: recommendData,
+          feedbackTextData: feedbackTextData,
+        });
+
+        console.log("this is satisfaction data", satisfactionData);
+        console.log("this is recommend data", recommendData);
+        console.log("this is feedback text data", feedbackTextData);
+        console.log("Processed state: ", this.state);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     this.setState({
       loading: false,
@@ -249,6 +522,24 @@ export default class View extends React.Component {
       const data = this.state.content.data.filter((item) => {
         return item.ProjectId == id;
       });
+
+      //retrieving data for the project
+      //retrieving name of the project
+      const projectData = data.length > 0 ? data[0] : {};
+      const projectName = projectData.ProjectName || "";
+      console.log("Project name:", projectName);
+
+      //retrieving satisfaction data for the project
+      //retrieving recommend data for the project
+      //retrieving feedback text data for the project
+      const satisfactionDataForProject = this.state.satisfactionData[projectName] || [];
+      const recommendDataForProject = this.state.recommendData[projectName] || [];
+      const feedbackTextDataForProject = this.state.feedbackTextData[projectName] || [];
+
+      console.log("Satisfaction data: ", satisfactionDataForProject);
+      console.log("Recommend data: ", recommendDataForProject);
+      console.log("Feedback data: ", feedbackTextDataForProject);
+
       return (
         <DatapageLayout
           settings={this.settings}
@@ -263,6 +554,21 @@ export default class View extends React.Component {
           has={this.has}
         >
           <ProjectTable data={data[0]} delete={this.delete} />
+          <br />
+          <h1>Customer Feedback</h1>
+          <br />
+          <br />
+          <div>
+            <FeedbackCharts
+              satisfactionData={satisfactionDataForProject}
+              recommendData={recommendDataForProject}
+              feedbackTextData={feedbackTextDataForProject}
+            />
+            <br />
+            <br />
+            <h3 style={{ position: "absolute", left: "60px" }}>Feedback Word Cloud</h3>
+            <FeedbackWordCloud feedbackTextData={feedbackTextDataForProject} />
+          </div>
           <div>
             <VolunteerTable
               deleteVolunteer={this.deleteVolunteer}
