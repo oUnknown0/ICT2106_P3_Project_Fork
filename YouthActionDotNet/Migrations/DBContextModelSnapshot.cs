@@ -185,9 +185,6 @@ namespace YouthActionDotNet.Migrations
                     b.Property<string>("ProjectStatus")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ProjectVolunteer")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("ServiceCenterId")
                         .HasColumnType("TEXT");
 
