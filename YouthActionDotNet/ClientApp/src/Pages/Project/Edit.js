@@ -424,7 +424,8 @@ const ProjectTable = (props) => {
     project.ProjectEndDate = timeline.ProjectEndDate;
     project.ProjectCompletionDate = timeline.ProjectCompletionDate;
     console.log(budget.ProjectBudget);
-    // project.ProjectBudget = budget.ProjectBudget;
+    project.ProjectBudget = budget.ProjectBudget;
+
     // submit split into 3 parts, project, timeline, budget
     updateProject(project);
     // event.preventDefault();
@@ -528,75 +529,7 @@ const ProjectTable = (props) => {
           />
         </Form.Group>
       </Row>
-      <div>
-        <h1 style={{ marginTop: "100px", marginBottom: "20px" }}>
-          Add Volunteers to this Project
-        </h1>
-        <Button onClick={handleClick} variant="primary">
-          Show Available Volunteers
-        </Button>
-        {!showTable && (
-          <Table striped bordered hover style={{ marginTop: "20px" }}>
-            <thead>
-              <tr>
-                <th>User ID</th>
-                <th>User Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            {/* {props?.volunteerData.map((item) => {
-              console.log(
-                "check=>",
-                props?.data.ProjectType?.includes(item?.UserId)
-              );
-              return (
-                <>
-                  {props?.data.ProjectType?.includes(item?.UserId) ? null : (
-                    <tbody>
-                      <tr>
-                        <td>{item?.UserId || "N/A"}</td>
-                        <td>{item?.username || "N/A"}</td>
-                        <td>{item?.Email || "N/A"}</td>
-                        <td>{item?.Role || "N/A"}</td>
-                        <td
-                          style={{
-                            textAlign: "center",
-                            width: "100px",
-                            height: "100px",
-                          }}
-                        >
-                          <Button
-                            onClick={() => {
-                              if (
-                                !JSON.stringify(
-                                  props?.volunteerList || []
-                                )?.includes(item?.UserId)
-                              ) {
-                                props?.setVolunteerList(item, true);
-                              } else {
-                                props?.setVolunteerList(item, false);
-                              }
-                            }}
-                          >
-                            {!JSON.stringify(
-                              props?.volunteerList || []
-                            )?.includes(item?.UserId)
-                              ? "select"
-                              : "Unselect"}
-                          </Button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  )}
-                </>
-              );
-            })} */}
-            :
-          </Table>
-        )}
-      </div>
+
       <Button variant="primary" type="submit">
         Submit
       </Button>

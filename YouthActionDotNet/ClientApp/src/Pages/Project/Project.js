@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   Cell,
   ListTable,
@@ -847,7 +848,22 @@ const ProjectTable = (props) => {
   const applySorting = props.applySorting;
   const routeChange = props.routeChange;
   const sorting = props.sorting;
-
+  const [timelines, setTimeline] = useState([]);
+  const [budgets, setBudget] = useState([]);
+  useEffect(() => {
+    const getTimelineData = async () => {
+      const res = await axios.get(`https://localhost:5001/api/Timeline/All`);
+      console.log(res.data.data);
+      setTimeline(res.data.data);
+    };
+    const getBudgetData = async () => {
+      const res = await axios.get(`https://localhost:5001/api/Budget/All`);
+      console.log(res.data.data);
+      setBudget(res.data.data);
+    };
+    getBudgetData();
+    getTimelineData();
+  }, []);
   return (
     <>
       <Table striped bordered hover>
@@ -865,13 +881,13 @@ const ProjectTable = (props) => {
             >
               Project Description
             </th>
-            <th
+            {/* <th
               onClick={() =>
                 applySorting("ProjectVolunteer", !sorting.ascending)
               }
             >
               Project Type
-            </th>
+            </th> */}
             <th
               onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
             >
@@ -898,6 +914,14 @@ const ProjectTable = (props) => {
           </tr>
         </thead>
         {projects.map((item, key) => {
+          let budgetItem = budgets.find(
+            (budget) => budget.BudgetId == item.BudgetId
+          );
+          let timelineItem = timelines.find(
+            (timeline) => timeline.TimelineId == item.TimelineId
+          );
+          console.log(timelineItem);
+          console.log(budgetItem);
           return (
             <tbody key={key}>
               <tr>
@@ -919,9 +943,19 @@ const ProjectTable = (props) => {
                   </>
                 </td>
                 {/* <td>{item.ProjectVolunteer}</td> */}
-                <td>{item.ProjectBudget ? item.ProjectBudget : "Not set"}</td>
-                <td>{item.ProjectStartDate}</td>
-                <td>{item.ProjectEndDate}</td>
+                <td>
+                  {budgetItem?.ProjectBudget ? budgetItem.ProjectBudget : "N/A"}
+                </td>
+                <td>
+                  {timelineItem?.ProjectStartDate
+                    ? timelineItem.ProjectStartDate
+                    : "N/A"}
+                </td>
+                <td>
+                  {timelineItem?.ProjectEndDate
+                    ? timelineItem.ProjectEndDate
+                    : "N/A"}
+                </td>
                 <td>{item.ProjectStatus}</td>
                 <td>
                   <button onClick={() => routeChange(item.ProjectId)}>

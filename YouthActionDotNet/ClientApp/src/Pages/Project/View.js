@@ -7,6 +7,8 @@ import Button from "react-bootstrap/Button";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import { Overlay } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useParams } from "react-router";
 
 export default class View extends React.Component {
   state = {
@@ -159,7 +161,7 @@ export default class View extends React.Component {
     const data = {
       ...Project[0],
       ProjectId: Project[0]?.ProjectId,
-      ProjectType: JSON.stringify([
+      ProjectVolunteer: JSON.stringify([
         ...projectVolunteers,
         ...this.state.selectedVolunteer,
       ]),
@@ -269,6 +271,7 @@ export default class View extends React.Component {
             <h1 style={{ marginTop: "100px", marginBottom: "20px" }}>
               Add Volunteers to this Project
             </h1>
+            {console.log(this.state.volunteer)}
             <TableButton
               volunteerData={this.state.volunteer}
               setVolunteerList={this.setVolunteerList}
@@ -294,6 +297,35 @@ const ProjectTable = (props) => {
     let path = `/Project/Edit/${id}`;
     navigate(path);
   };
+
+  const params = useParams();
+  const id = params.id;
+  console.log(id);
+  const [timeline, setTimeline] = useState([]);
+  const [budget, setBudget] = useState();
+  useEffect(() => {
+    const getTimelineData = async () => {
+      const res = await axios.get(`https://localhost:5001/api/Timeline/All`);
+      console.log(res.data.data);
+      let timelineItem = res.data.data.find(
+        (timeline) => timeline.TimelineId == data.TimelineId
+      );
+      setTimeline(timelineItem);
+    };
+    const getBudgetData = async () => {
+      const res = await axios.get(`https://localhost:5001/api/Budget/All`);
+      console.log(res.data.data);
+      let budgetItem = res.data.data.find(
+        (budget) => budget.BudgetId == data.BudgetId
+      );
+      console.log(budgetItem);
+      setBudget(budgetItem);
+    };
+    getBudgetData();
+    getTimelineData();
+  }, []);
+
+  console.log(budget);
   return (
     <Table striped bordered hover>
       <thead>
@@ -304,6 +336,7 @@ const ProjectTable = (props) => {
           <th>Project Budget</th>
           <th>Start Date</th>
           <th>End Date</th>
+          <th>Completion Date</th>
           <th>Project Status</th>
           <th>Action</th>
         </tr>
@@ -313,9 +346,10 @@ const ProjectTable = (props) => {
           <td></td>
           <td>{data.ProjectName}</td>
           <td colSpan={2}>{data.ProjectDescription || "N/A"}</td>
-          <td>{data.ProjectBudget}</td>
-          <td>{data.ProjectStartDate}</td>
-          <td>{data.ProjectEndDate}</td>
+          <td>{budget?.ProjectBudget || "N/A"}</td>
+          <td>{timeline?.ProjectStartDate || "N/A"}</td>
+          <td>{timeline?.ProjectEndDate || "N/A"}</td>
+          <td>{timeline?.ProjectCompletionDate || "N/A"}</td>
           <td>{data.ProjectStatus}</td>
           <td>
             <button
@@ -361,11 +395,11 @@ function TableButton(props) {
           {props?.volunteerData.map((item) => {
             console.log(
               "check=>",
-              props?.data.ProjectType?.includes(item?.UserId)
+              props?.data.ProjectVolunteer?.includes(item?.UserId)
             );
             return (
               <>
-                {props?.data.ProjectType?.includes(item?.UserId) ? null : (
+                {props?.data.ProjectVolunteer?.includes(item?.UserId) ? null : (
                   <tbody>
                     <tr>
                       <td>{item?.UserId || "N/A"}</td>
@@ -445,8 +479,9 @@ function VolunteerTable(props) {
             </tr>
           </thead>
 
-          {JSON.parse(props?.data.ProjectType || "[]")?.length > 0 ? (
-            JSON.parse(props?.data.ProjectType || "[]").map((item) => {
+          {JSON.parse(props?.data.ProjectVolunteer || "[]")?.length > 0 ? (
+            JSON.parse(props?.data.ProjectVolunteer || "[]").map((item) => {
+              console.log(item);
               return (
                 <>
                   <tbody>
