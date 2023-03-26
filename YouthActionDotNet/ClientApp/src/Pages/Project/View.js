@@ -9,9 +9,11 @@ import { Overlay } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useParams } from "react-router";
-import { Chart } from 'chart.js';
-import * as d3 from 'd3';
-import cloud from 'd3-cloud';
+import { Chart } from "chart.js";
+import * as d3 from "d3";
+import cloud from "d3-cloud";
+import { Pie, Bar, Line } from "react-chartjs-2";
+import { CreateButton } from "./Project";
 
 //feedback charts for satisfaction and recommend
 const FeedbackCharts = ({ satisfactionData, recommendData }) => {
@@ -20,11 +22,11 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
 
   const generateSatisfactionChartData = (data) => {
     const labels = [
-      'Very unsatisfied',
-      'Somewhat unsatisfied',
-      'Neutral',
-      'Somewhat satisfied',
-      'Very satisfied',
+      "Very unsatisfied",
+      "Somewhat unsatisfied",
+      "Neutral",
+      "Somewhat satisfied",
+      "Very satisfied",
     ];
     const counts = [0, 0, 0, 0, 0];
 
@@ -36,21 +38,21 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
       labels,
       datasets: [
         {
-          label: 'Satisfaction',
+          label: "Satisfaction",
           data: counts,
           backgroundColor: [
-            'rgba(255, 99, 132, 0.2)',
-            'rgba(255, 159, 64, 0.2)',
-            'rgba(255, 205, 86, 0.2)',
-            'rgba(75, 192, 192, 0.2)',
-            'rgba(54, 162, 235, 0.2)',
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(255, 159, 64, 0.2)",
+            "rgba(255, 205, 86, 0.2)",
+            "rgba(75, 192, 192, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
           ],
           borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(255, 159, 64, 1)',
-            'rgba(255, 205, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(54, 162, 235, 1)',
+            "rgba(255, 99, 132, 1)",
+            "rgba(255, 159, 64, 1)",
+            "rgba(255, 205, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(54, 162, 235, 1)",
           ],
           borderWidth: 1,
         },
@@ -59,7 +61,7 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
   };
 
   const generateRecommendChartData = (data) => {
-    const labels = ['Yes', 'No'];
+    const labels = ["Yes", "No"];
     const counts = [0, 0];
 
     data.forEach((recommend) => {
@@ -71,8 +73,11 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
       datasets: [
         {
           data: counts,
-          backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-          borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+          backgroundColor: [
+            "rgba(75, 192, 192, 0.2)",
+            "rgba(255, 99, 132, 0.2)",
+          ],
+          borderColor: ["rgba(75, 192, 192, 1)", "rgba(255, 99, 132, 1)"],
           borderWidth: 1,
         },
       ],
@@ -82,7 +87,7 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
   useEffect(() => {
     if (satisfactionChartRef.current && recommendChartRef.current) {
       const satisfactionChart = new Chart(satisfactionChartRef.current, {
-        type: 'bar',
+        type: "bar",
         data: generateSatisfactionChartData(satisfactionData),
         options: {
           scales: {
@@ -94,34 +99,39 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
       });
 
       const recommendChart = new Chart(recommendChartRef.current, {
-        type: 'pie',
+        type: "pie",
         data: generateRecommendChartData(recommendData),
         options: {
           height: 20,
-          width: 20
-        }
+          width: 20,
+        },
       });
-
 
       return () => {
         satisfactionChart.destroy();
         recommendChart.destroy();
       };
     }
-  }, [satisfactionChartRef, recommendChartRef, satisfactionData, recommendData]);
+  }, [
+    satisfactionChartRef,
+    recommendChartRef,
+    satisfactionData,
+    recommendData,
+  ]);
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: 1, marginLeft: '50px', marginRight: '50px' }}>
+    <div style={{ display: "flex" }}>
+      <div style={{ flex: 1, marginLeft: "50px", marginRight: "50px" }}>
         <h3>Satisfaction Data</h3>
         <canvas ref={satisfactionChartRef} />
       </div>
-      <div style={{ flex: 1, marginLeft: '20px', height: '360px', width: '767px' }}>
+      <div
+        style={{ flex: 1, marginLeft: "20px", height: "360px", width: "767px" }}
+      >
         <h3>Recommend Data</h3>
         <canvas ref={recommendChartRef} />
       </div>
     </div>
-
   );
 };
 
@@ -136,7 +146,7 @@ const FeedbackWordCloud = ({ feedbackTextData }) => {
     const words = allFeedbackText.reduce((acc, feedbackText) => {
       const wordsInText = feedbackText.split(/\s+/);
       wordsInText.forEach((word) => {
-        const cleanedWord = word.replace(/[^\w]/g, '').toLowerCase();
+        const cleanedWord = word.replace(/[^\w]/g, "").toLowerCase();
         if (cleanedWord) {
           if (acc[cleanedWord]) {
             acc[cleanedWord]++;
@@ -155,7 +165,6 @@ const FeedbackWordCloud = ({ feedbackTextData }) => {
     setWordArray(newWordArray);
   }, [feedbackTextData]);
 
-
   useEffect(() => {
     if (!wordArray.length) {
       return;
@@ -165,7 +174,7 @@ const FeedbackWordCloud = ({ feedbackTextData }) => {
       const height = 160;
 
       const svg = d3.select(svgRef.current);
-      svg.attr('width', width).attr('height', height);
+      svg.attr("width", width).attr("height", height);
 
       const layout = cloud()
         .size([width, height])
@@ -173,27 +182,29 @@ const FeedbackWordCloud = ({ feedbackTextData }) => {
         .padding(5)
         .rotate(() => (Math.random() - 0.5) * 90)
         .fontSize((d) => d.size)
-        .on('end', draw);
+        .on("end", draw);
 
       layout.start();
 
       function draw(words) {
-        svg.selectAll('g').remove(); // Clear the previous words
+        svg.selectAll("g").remove(); // Clear the previous words
 
         svg
-          .append('g')
-          .attr('transform', `translate(${layout.size()[0] / 2 + 60}, ${layout.size()[1] / 2})`)
-          .selectAll('text')
+          .append("g")
+          .attr(
+            "transform",
+            `translate(${layout.size()[0] / 2 + 60}, ${layout.size()[1] / 2})`
+          )
+          .selectAll("text")
           .data(words)
           .enter()
-          .append('text')
-          .style('font-size', (d) => `${d.size}px`)
-          .style('fill', () => `hsl(${Math.random() * 360}, 100%, 50%)`)
-          .attr('text-anchor', 'middle')
-          .attr('transform', (d) => `translate(${[d.x, d.y]})`) // Removed rotation
+          .append("text")
+          .style("font-size", (d) => `${d.size}px`)
+          .style("fill", () => `hsl(${Math.random() * 360}, 100%, 50%)`)
+          .attr("text-anchor", "middle")
+          .attr("transform", (d) => `translate(${[d.x, d.y]})`) // Removed rotation
           .text((d) => d.text);
       }
-
     };
 
     drawWordCloud(wordArray);
@@ -278,7 +289,7 @@ export default class View extends React.Component {
             projectName: feedbackItem.ProjectName,
             satisfaction: feedbackItem.Satisfaction,
             recommend: feedbackItem.Recommend,
-            feedbackText: feedbackItem.FeedbackText
+            feedbackText: feedbackItem.FeedbackText,
           };
         });
         console.log(feedbackData);
@@ -308,9 +319,14 @@ export default class View extends React.Component {
         });
 
         //checking the details for the recommend data for each project
-        Object.entries(recommendData).forEach(([projectName, projectRecommendData]) => {
-          console.log(`Project name: ${projectName}, Recommend data:`, projectRecommendData);
-        });
+        Object.entries(recommendData).forEach(
+          ([projectName, projectRecommendData]) => {
+            console.log(
+              `Project name: ${projectName}, Recommend data:`,
+              projectRecommendData
+            );
+          }
+        );
 
         //retrieving feedback text data
         const feedbackTextData = {};
@@ -532,9 +548,12 @@ export default class View extends React.Component {
       //retrieving satisfaction data for the project
       //retrieving recommend data for the project
       //retrieving feedback text data for the project
-      const satisfactionDataForProject = this.state.satisfactionData[projectName] || [];
-      const recommendDataForProject = this.state.recommendData[projectName] || [];
-      const feedbackTextDataForProject = this.state.feedbackTextData[projectName] || [];
+      const satisfactionDataForProject =
+        this.state.satisfactionData[projectName] || [];
+      const recommendDataForProject =
+        this.state.recommendData[projectName] || [];
+      const feedbackTextDataForProject =
+        this.state.feedbackTextData[projectName] || [];
 
       console.log("Satisfaction data: ", satisfactionDataForProject);
       console.log("Recommend data: ", recommendDataForProject);
@@ -553,22 +572,29 @@ export default class View extends React.Component {
           requestError={this.requestError}
           has={this.has}
         >
-          <ProjectTable data={data[0]} delete={this.delete} />
-          <br />
-          <h1>Customer Feedback</h1>
-          <br />
-          <br />
-          <div>
-            <FeedbackCharts
-              satisfactionData={satisfactionDataForProject}
-              recommendData={recommendDataForProject}
-              feedbackTextData={feedbackTextDataForProject}
-            />
+          <div id="pdffile">
+            <ProjectTable data={data[0]} delete={this.delete} />
+            <br />
+            <h1>Customer Feedback</h1>
             <br />
             <br />
-            <h3 style={{ position: "absolute", left: "60px" }}>Feedback Word Cloud</h3>
-            <FeedbackWordCloud feedbackTextData={feedbackTextDataForProject} />
+            <div>
+              <FeedbackCharts
+                satisfactionData={satisfactionDataForProject}
+                recommendData={recommendDataForProject}
+                feedbackTextData={feedbackTextDataForProject}
+              />
+              <br />
+              <br />
+              <h3 style={{ position: "absolute", left: "60px" }}>
+                Feedback Word Cloud
+              </h3>
+              <FeedbackWordCloud
+                feedbackTextData={feedbackTextDataForProject}
+              />
+            </div>
           </div>
+          <CreateButton />
           <div>
             <VolunteerTable
               deleteVolunteer={this.deleteVolunteer}
@@ -630,46 +656,91 @@ const ProjectTable = (props) => {
     getBudgetData();
     getTimelineData();
   }, []);
+  const handlePin = async (data) => {
+    console.log(data);
+    const res = await axios
+      .put(`https://localhost:5001/api/Project/${data.ProjectId}`, {
+        ...data,
+        ProjectStatus: "Pinned",
+      })
+      .then(window.location.reload());
+    console.log(res);
+  };
 
+  const handleUnpin = async (data) => {
+    console.log(data);
+    const res = await axios
+      .put(`https://localhost:5001/api/Project/${data.ProjectId}`, {
+        ...data,
+        ProjectStatus: "inProgress",
+      })
+      .then(window.location.reload());
+    console.log(res);
+  };
+  const handleArchive = async (data) => {
+    console.log(data);
+    const res = await axios
+      .put(`https://localhost:5001/api/Project/${data.ProjectId}`, {
+        ...data,
+        ProjectStatus: "Archived",
+      })
+      .then(window.location.reload());
+    console.log(res);
+  };
   console.log(budget);
   return (
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Project Name</th>
-          <th colSpan={2}>Project Description</th>
-          <th>Project Budget</th>
-          <th>Start Date</th>
-          <th>End Date</th>
-          <th>Completion Date</th>
-          <th>Project Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td>{data.ProjectName}</td>
-          <td colSpan={2}>{data.ProjectDescription || "N/A"}</td>
-          <td>{budget?.ProjectBudget || "N/A"}</td>
-          <td>{timeline?.ProjectStartDate || "N/A"}</td>
-          <td>{timeline?.ProjectEndDate || "N/A"}</td>
-          <td>{timeline?.ProjectCompletionDate || "N/A"}</td>
-          <td>{data.ProjectStatus}</td>
-          <td>
-            <button
-              onClick={() => {
-                deleteFn(data.ProjectId);
-              }}
-            >
-              Delete
-            </button>
-            <button onClick={() => routeChange(data.ProjectId)}>Edit</button>
-          </td>
-        </tr>
-      </tbody>
-    </Table>
+    <>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Project Name</th>
+            <th colSpan={2}>Project Description</th>
+            <th>Project Budget</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Completion Date</th>
+            <th>Project Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td>{data.ProjectName}</td>
+            <td colSpan={2}>{data.ProjectDescription || "N/A"}</td>
+            <td>{budget?.ProjectBudget || "N/A"}</td>
+            <td>{timeline?.ProjectStartDate || "N/A"}</td>
+            <td>{timeline?.ProjectEndDate || "N/A"}</td>
+            <td>{timeline?.ProjectCompletionDate || "N/A"}</td>
+            <td>{data.ProjectStatus}</td>
+            <td>
+              <button
+                onClick={() => {
+                  deleteFn(data.ProjectId);
+                }}
+              >
+                Delete
+              </button>
+              <button onClick={() => routeChange(data.ProjectId)}>Edit</button>
+              <button
+                onClick={() => {
+                  if (data.ProjectStatus === "Pinned") {
+                    handleUnpin(data);
+                  } else {
+                    handlePin(data);
+                  }
+                }}
+              >
+                Pin
+              </button>
+              <button onClick={() => handleArchive(data)}>Archive</button>
+            </td>
+          </tr>
+        </tbody>
+      </Table>
+      <GenerateChart data={data} timeline={timeline} budget={budget} />
+    </>
   );
 };
 function TableButton(props) {
@@ -820,5 +891,139 @@ function VolunteerTable(props) {
         </Table>
       </div>
     </>
+  );
+}
+
+function GenerateChart(props) {
+  const item = props.data;
+  const timeline = props.timeline;
+  const budget = props.budget;
+  const getChartData1 = (startDate, endDate, budget) => {
+    const startMonth = new Date(startDate).getMonth();
+    const endMonth = new Date(endDate).getMonth();
+    const labels = [];
+
+    if (endMonth - startMonth < 2) {
+      const startMonthName = new Date(startDate).toLocaleString("default", {
+        month: "short",
+      });
+      const endMonthName = new Date(endDate).toLocaleString("default", {
+        month: "short",
+      });
+      labels.push(startMonthName, endMonthName);
+    } else {
+      for (let i = startMonth; i <= endMonth; i++) {
+        labels.push(
+          new Date(2023, i, 1).toLocaleString("default", { month: "short" })
+        );
+      }
+    }
+
+    const totalMonths = labels.length;
+    const data = [];
+    let remainingBudget = budget;
+    for (let i = 0; i < totalMonths; i++) {
+      let estimatedBudget;
+
+      if (totalMonths === 1) {
+        estimatedBudget = budget;
+      } else if (totalMonths === 2) {
+        estimatedBudget = budget / 2;
+      } else if (i === 0 || i === totalMonths - 1) {
+        estimatedBudget = remainingBudget / 3;
+      } else {
+        const factor = Math.abs(i - (totalMonths - 1) / 2);
+        estimatedBudget =
+          (remainingBudget * (factor + 1)) /
+          ((totalMonths * (totalMonths + 1)) / 4);
+      }
+
+      estimatedBudget = Math.round(estimatedBudget * 100) / 100;
+
+      data.push(estimatedBudget);
+      remainingBudget -= estimatedBudget;
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Estimated Budget",
+          data,
+          backgroundColor: "#a6192e",
+          borderColor: "#a6192e",
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+
+  const getChartData2 = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const today = new Date();
+    const daysLeft = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+
+    const labels = [];
+    const data = [];
+
+    let currentDate = start;
+    while (currentDate <= end) {
+      const formattedDate = currentDate.toLocaleString("en-US", {
+        month: "short",
+      });
+      labels.push(formattedDate);
+
+      if (currentDate <= today) {
+        data.push(
+          daysLeft - Math.ceil((today - currentDate) / (1000 * 60 * 60 * 24))
+        );
+      } else {
+        data.push(
+          daysLeft - Math.ceil((currentDate - today) / (1000 * 60 * 60 * 24))
+        );
+      }
+
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    return {
+      labels: labels,
+      datasets: [
+        {
+          label: "daysleft",
+          data: data,
+          backgroundColor: "#94795d",
+        },
+      ],
+    };
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+      }}
+    >
+      <div style={{ width: 600, height: 300, overflow: "auto" }}>
+        {console.log(item, budget, timeline)}
+        <Bar
+          data={getChartData1(
+            timeline?.ProjectStartDate,
+            timeline?.ProjectEndDate,
+            budget?.ProjectBudget
+          )}
+        />
+      </div>
+      <div style={{ width: 600, height: 300, overflow: "auto" }}>
+        <Line
+          data={getChartData2(
+            timeline?.ProjectStartDate,
+            timeline?.ProjectEndDate
+          )}
+        />
+      </div>
+    </div>
   );
 }

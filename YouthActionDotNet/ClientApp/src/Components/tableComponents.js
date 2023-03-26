@@ -49,7 +49,11 @@ export class ExpandableRow extends React.Component {
         onMouseLeave={this.handleButtonRelease}
         className={"expandableRow"}
       >
-        <div className={this.state.rowClasses} onClick={this.expand}  style={{"--Columns": Object.keys(this.props.headers).length}}>
+        <div
+          className={this.state.rowClasses}
+          onClick={this.expand}
+          style={{ "--Columns": Object.keys(this.props.headers).length }}
+        >
           {/* {this.props.headers.map((cell, secIndex) => {
             return (
               <Cell width={"100%"} key={secIndex}>
@@ -59,45 +63,55 @@ export class ExpandableRow extends React.Component {
           })}
            */}
           {Object.keys(this.props.headers).map((key, index) => {
-            return <Cell width={"100%"} key={index}>{
-              this.props.fieldSettings[key].type === "dropdown"?
-                this.props.fieldSettings[key].options.find((option) => option.value === this.props.values[key])?.label
-              :
-              this.props.values[key]
-              
-            }</Cell>
+            return (
+              <Cell width={"100%"} key={index}>
+                {this.props.fieldSettings[key].type === "dropdown"
+                  ? this.props.fieldSettings[key].options.find(
+                      (option) => option.value === this.props.values[key]
+                    )?.label
+                  : this.props.values[key]}
+              </Cell>
+            );
           })}
         </div>
+
         {this.state.expanded ? (
           <div className={this.state.expandedClass}>
             <div className="row justify-content-center align-items-start expandedRow">
-
               <div className="col-12 col-lg-9 expansionColumn">
                 <div className="expansionColumn-fieldcontainer">
-                  
-
-                {
-                this.props.hasFields ?
-                Object.keys(this.props.fieldSettings).map((field, index) => {
-                  return (
-                    <StdInput
-                      key={index}
-                      label={this.props.fieldSettings[field].displayLabel}
-                      fieldLabel={field}
-                      type={this.props.fieldSettings[field].type}
-                      enabled={this.props.perms.Update ? this.props.fieldSettings[field].editable : false}
-                      hasSaveBtn={true}
-                      showIndicator={this.props.fieldSettings[field].editable}
-                      value={this.props.values[field]}
-                      onChange={this.updateHandle}
-                      options={this.props.fieldSettings[field].options}
-                      dateFormat={this.props.fieldSettings[field].dateFormat}
-                      toolTip={this.props.fieldSettings[field].toolTip}
-                    ></StdInput>
-                  );
-                })
-                :
-                ""}
+                  {this.props.hasFields
+                    ? Object.keys(this.props.fieldSettings).map(
+                        (field, index) => {
+                          return (
+                            <StdInput
+                              key={index}
+                              label={
+                                this.props.fieldSettings[field].displayLabel
+                              }
+                              fieldLabel={field}
+                              type={this.props.fieldSettings[field].type}
+                              enabled={
+                                this.props.perms.Update
+                                  ? this.props.fieldSettings[field].editable
+                                  : false
+                              }
+                              hasSaveBtn={true}
+                              showIndicator={
+                                this.props.fieldSettings[field].editable
+                              }
+                              value={this.props.values[field]}
+                              onChange={this.updateHandle}
+                              options={this.props.fieldSettings[field].options}
+                              dateFormat={
+                                this.props.fieldSettings[field].dateFormat
+                              }
+                              toolTip={this.props.fieldSettings[field].toolTip}
+                            ></StdInput>
+                          );
+                        }
+                      )
+                    : ""}
                 </div>
                 {this.props.children}
               </div>
@@ -122,18 +136,30 @@ export class Row extends React.Component {
   render() {
     return (
       <div>
-        <div className={this.state.rowClasses} style={{"--Columns": this.state.columns}}>{this.props.children}</div>
+        <div
+          className={this.state.rowClasses}
+          style={{ "--Columns": this.state.columns }}
+        >
+          {this.props.children}
+        </div>
       </div>
     );
   }
 }
 
 export class HeaderRow extends React.Component {
-  state={
+  state = {
     columns: React.Children.toArray(this.props.children).length,
-  }
+  };
   render() {
-    return <div className="tableRow headerRow" style={{"--Columns": this.state.columns}}>{this.props.children}</div>;
+    return (
+      <div
+        className="tableRow headerRow"
+        style={{ "--Columns": this.state.columns }}
+      >
+        {this.props.children}
+      </div>
+    );
   }
 }
 

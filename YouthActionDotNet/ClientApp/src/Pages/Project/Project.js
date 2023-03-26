@@ -9,6 +9,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Accordion from "react-bootstrap/Accordion";
+import JsPDF from "jspdf";
+import { StdButton } from "../../Components/common";
 import {
   Cell,
   ListTable,
@@ -18,6 +21,7 @@ import {
 import { FaFileWord } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa";
+import { Pie, Bar, Line } from "react-chartjs-2";
 export default class Project extends React.Component {
   // state = {
   //   content: null,
@@ -823,24 +827,49 @@ const DisplayTables = (props) => {
 
   return (
     <>
-      <div>
-        <h1>Pinned Projects</h1>
-      </div>
-      <ProjectTable
-        projects={pinnedProjects}
-        applySorting={applySorting}
-        routeChange={routeChange}
-        sorting={sorting}
-      />
-      <div>
-        <h1>Other Projects</h1>
-      </div>
-      <ProjectTable
-        projects={otherProjects}
-        applySorting={applySorting}
-        routeChange={routeChange}
-        sorting={sorting}
-      />
+      <Accordion defaultActiveKey="0">
+        <Accordion.Item eventKey="0">
+          <Accordion.Header>Pinned Projects</Accordion.Header>
+          <Accordion.Body>
+            <ProjectTable
+              projects={pinnedProjects}
+              applySorting={applySorting}
+              routeChange={routeChange}
+              sorting={sorting}
+            />
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="1">
+          <Accordion.Header>Current Projects</Accordion.Header>
+          <Accordion.Body>
+            <ProjectTable
+              projects={otherProjects}
+              applySorting={applySorting}
+              routeChange={routeChange}
+              sorting={sorting}
+            />
+          </Accordion.Body>
+        </Accordion.Item>
+        <Accordion.Item eventKey="2">
+          <Accordion.Header>Archived Projects</Accordion.Header>
+          <Accordion.Body>
+            <ProjectTable
+              projects={archiveProjects}
+              applySorting={applySorting}
+              routeChange={routeChange}
+              sorting={sorting}
+            />
+          </Accordion.Body>
+        </Accordion.Item>
+
+        <Accordion.Item eventKey="3">
+          <Accordion.Header>Charts</Accordion.Header>
+          <Accordion.Body>
+            <GenerateChart projects={projects} />
+            <CreateButton />
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
     </>
   );
 };
@@ -964,6 +993,7 @@ const ProjectTable = (props) => {
                   <button onClick={() => routeChange(item.ProjectId)}>
                     View
                   </button>
+
                   {/* <button onClick={() => setUndo(true)}>Undo</button> */}
                 </td>
               </tr>
@@ -976,478 +1006,125 @@ const ProjectTable = (props) => {
   );
 };
 
-const PinnedProjectTable = (props) => {
-  const data = props.data;
-  const deleteFn = props.delete;
-  const createFn = props.create;
-  let navigate = useNavigate();
-  const routeChange = (id) => {
-    let path = `/Project/View/${id}`;
-    navigate(path);
-  };
-  const routeReturn = () => {
-    let path = `/Project`;
-    navigate(path);
-  };
-
-  const countRef = useRef();
-  const [projects, setProjects] = useState([]);
-  const [projRef, setProjRef] = useState();
-  const [undo, setUndo] = useState(false);
-  const [sorting, setSorting] = useState({
-    field: "ProjectName",
-    ascending: true,
-  });
-  const params = useParams();
-  console.log(params);
-  if (params.id) {
-    console.log(params.id);
-  } else {
-    console.log("no params");
-  }
-  const options = {
-    onClose: () => {
-      console.log(countRef);
-      if (countRef.current == null) {
-        deleteFn(params.id);
-      }
-    },
-    autoClose: 2000,
-    hideProgressBar: true,
-    className: "black-background",
-    position: toast.POSITION.BOTTOM_CENTER,
-  };
-
-  //When delete is clicked, all details of the project will be copied and stored in temporary variable.
+const GenerateChart = (props) => {
+  const projects = props.projects;
+  const [timelines, setTimeline] = useState([]);
+  const [budgets, setBudget] = useState([]);
   useEffect(() => {
-    // setProjects(data);
-    const projectsCopy = [...data];
-    const projectsFiltered = projectsCopy.filter((project) => {
-      return project.ProjectStatus == "Pinned";
+    const getTimelineData = async () => {
+      const res = await axios.get(`https://localhost:5001/api/Timeline/All`);
+      console.log(res.data.data);
+      setTimeline(res.data.data);
+    };
+    const getBudgetData = async () => {
+      const res = await axios.get(`https://localhost:5001/api/Budget/All`);
+      console.log(res.data.data);
+      setBudget(res.data.data);
+    };
+    getBudgetData();
+    getTimelineData();
+  }, []);
+  const getChartData3 = (projects) => {
+    const inProgress = projects.filter((project) => {
+      return project.ProjectStatus !== "Archived";
+    }).length;
+    const completed = projects.filter((project) => {
+      return project.ProjectStatus === "Archived";
+    }).length;
+    console.log(completed);
+    return {
+      labels: ["In Progress Projects", "Completed Project"],
+      datasets: [
+        {
+          label: "Projects",
+          data: [inProgress, completed],
+          backgroundColor: ["#FF1818", "#5463FF"],
+        },
+      ],
+    };
+  };
+  const getChartData4 = (projects, timelines) => {
+    const now = new Date();
+    const inProgress = projects.filter((project) => {
+      return project.ProjectStatus !== "Archived";
     });
-
-    console.log(projectsFiltered);
-    // Apply sorting
-    let sortedProjects = [];
-    if (undo == true) {
-      sortedProjects = projectsCopy
-        .sort((a, b) => {
-          console.log(a[sorting.field]);
-          console.log(b[sorting.field]);
-          if (typeof b[sorting.field] == "string") {
-            if (b) {
-              return a ? b[sorting.field]?.localeCompare(a[sorting.field]) : 1;
-            } else if (a) {
-              return b ? a[sorting.field]?.localeCompare(b[sorting.field]) : -1;
-            }
-          } else if (typeof b[sorting.field] == "number") {
-            if (b) {
-              return a ? b[sorting.field] - a[sorting.field] : 1;
-            } else if (a) {
-              return b ? a[sorting.field] - b[sorting.field] : -1;
-            }
-          }
-        })
-        .slice();
-    } else {
-      setProjRef(
-        projectsCopy.filter((project) => {
-          return project.ProjectId == params.id;
-        })
+    const data = inProgress.map((project) => {
+      const timeline = timelines.find(
+        (timeline) => timeline.TimelineId == project.TimelineId
       );
-      sortedProjects = projectsFiltered
-        .sort((a, b) => {
-          console.log(a[sorting.field]);
-          console.log(typeof b[sorting.field]);
-          if (typeof b[sorting.field] == "string") {
-            if (b) {
-              return a ? b[sorting.field]?.localeCompare(a[sorting.field]) : 1;
-            } else if (a) {
-              return b ? a[sorting.field]?.localeCompare(b[sorting.field]) : -1;
-            }
-          } else if (typeof b[sorting.field] == "number") {
-            if (b) {
-              return a ? b[sorting.field] - a[sorting.field] : 1;
-            } else if (a) {
-              return b ? a[sorting.field] - b[sorting.field] : -1;
-            }
-          }
-        })
-        .slice();
-    }
-    // Replace currentprojects with sorted currentprojects
-    setProjects(
-      // Decide either currentprojects sorted by ascending or descending order
-      sorting.ascending ? sortedProjects : sortedProjects.reverse()
-    );
-  }, [data, sorting, undo]);
-  useEffect(() => {
-    if (data.length > projects.length && projects.length != 0) {
-      notify();
-      //   console.log(data.length)
-      // console.log(projects.length)
-    }
-  }, [projects]);
-  //Toast Message is created to allow users to undo deletion of project
-  const notify = () => {
-    toast.info(undoToastBtn, options);
-  };
-  const undoToastBtn = () => (
-    <button
-      ref={countRef}
-      onClick={() => {
-        setUndo(true);
-        const proj = {
-          ProjectName: projRef[0].ProjectName,
-          ProjectDescription: projRef[0].ProjectDescription,
-          ProjectVolunteer: projRef[0].ProjectVolunteer,
-          ProjectBudget: projRef[0].ProjectBudget,
-          ProjectStartDate: projRef[0].ProjectStartDate,
-          ProjectEndDate: projRef[0].ProjectEndDate,
-          ProjectStatus: projRef[0].ProjectStatus,
-          ProjectCompletionDate: projRef[0].ProjectCompletionDate,
-          ProjectVolunteer: projRef[0].ProjectVolunteer,
-          ServiceCenterId: projRef[0].ServiceCenterId,
-        };
-        console.log(proj);
-        handleCreate(proj);
-        routeReturn();
-      }}
-    >
-      Undo
-    </button>
-  );
-
-  const handleCreate = async (proj) => await createFn(proj);
-
-  function applySorting(key, ascending) {
-    setSorting({ field: key, ascending: ascending });
-  }
-
-  console.log(projects);
-  return (
-    <>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th onClick={() => applySorting("ProjectName", !sorting.ascending)}>
-              Project Name
-            </th>
-            <th
-              colSpan={2}
-              onClick={() =>
-                applySorting("ProjectDescription", !sorting.ascending)
-              }
-            >
-              Project Description
-            </th>
-            <th
-              onClick={() =>
-                applySorting("ProjectVolunteer", !sorting.ascending)
-              }
-            >
-              Project Type
-            </th>
-            <th
-              onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
-            >
-              Project Budget
-            </th>
-            <th
-              onClick={() =>
-                applySorting("ProjectStartDate", !sorting.ascending)
-              }
-            >
-              Start Date
-            </th>
-            <th
-              onClick={() => applySorting("ProjectEndDate", !sorting.ascending)}
-            >
-              End Date
-            </th>
-            <th
-              onClick={() => applySorting("ProjectStatus", !sorting.ascending)}
-            >
-              Project Status
-            </th>
-          </tr>
-        </thead>
-        {projects.map((item, key) => {
-          return (
-            <tbody key={key}>
-              <tr>
-                <td>{key + 1}</td>
-                <td>{item.ProjectName}</td>
-                <td colSpan={2}>
-                  <>
-                    {item.ProjectDescription}
-                    {/* {JSON.parse(item.ProjectVolunteer || "[]")?.length > 0 ? (
-                      <div className="mt-2">
-                        <b>Volunteers: </b>
-                        {JSON.parse(item.ProjectVolunteer || "[]")?.map((item) => (
-                          <span>
-                            {item?.username} <span></span>
-                          </span>
-                        )) || "N/A"}
-                      </div>
-                    ) : null} */}
-                  </>
-                </td>
-
-                <td>{item.ProjectBudget}</td>
-                <td>{item.ProjectStartDate}</td>
-                <td>{item.ProjectEndDate}</td>
-                <td>{item.ProjectStatus}</td>
-                <td>
-                  <button onClick={() => routeChange(item.ProjectId)}>
-                    View
-                  </button>
-                  {/* <button onClick={() => setUndo(true)}>Undo</button> */}
-                </td>
-              </tr>
-            </tbody>
-          );
-        })}
-      </Table>
-      <ToastContainer theme="dark" />
-    </>
-  );
-};
-
-const ArchivedTable = (props) => {
-  const data = props.data;
-  const deleteFn = props.delete;
-  const createFn = props.create;
-  let navigate = useNavigate();
-  const routeChange = (id) => {
-    let path = `/Project/View/${id}`;
-    navigate(path);
-  };
-  const routeReturn = () => {
-    let path = `/Project`;
-    navigate(path);
-  };
-
-  const countRef = useRef();
-  const [projects, setProjects] = useState([]);
-  const [projRef, setProjRef] = useState();
-  const [undo, setUndo] = useState(false);
-  const [sorting, setSorting] = useState({
-    field: "ProjectName",
-    ascending: true,
-  });
-  const params = useParams();
-  console.log(params);
-  if (params.id) {
-    console.log(params.id);
-  } else {
-    console.log("no params");
-  }
-  const options = {
-    onClose: () => {
-      console.log(countRef);
-      if (countRef.current == null) {
-        deleteFn(params.id);
-      }
-    },
-    autoClose: 2000,
-    hideProgressBar: true,
-    className: "black-background",
-    position: toast.POSITION.BOTTOM_CENTER,
-  };
-
-  //When delete is clicked, all details of the project will be copied and stored in temporary variable.
-  useEffect(() => {
-    // setProjects(data);
-    const projectsCopy = [...data];
-    const projectsFiltered = projectsCopy.filter((project) => {
-      return project.ProjectStatus == "Archived";
+      console.log(timeline);
+      const endDate = new Date(timeline?.ProjectEndDate);
+      const diffInDays = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)); // difference in days between now and end date
+      return diffInDays < 0 ? 0 : diffInDays;
     });
+    const labels = inProgress.map((project) => project.ProjectName);
 
-    console.log(projectsFiltered);
-    // Apply sorting
-    let sortedProjects = [];
-    if (undo == true) {
-      sortedProjects = projectsCopy
-        .sort((a, b) => {
-          console.log(a[sorting.field]);
-          console.log(b[sorting.field]);
-          if (typeof b[sorting.field] == "string") {
-            if (b) {
-              return a ? b[sorting.field]?.localeCompare(a[sorting.field]) : 1;
-            } else if (a) {
-              return b ? a[sorting.field]?.localeCompare(b[sorting.field]) : -1;
-            }
-          } else if (typeof b[sorting.field] == "number") {
-            if (b) {
-              return a ? b[sorting.field] - a[sorting.field] : 1;
-            } else if (a) {
-              return b ? a[sorting.field] - b[sorting.field] : -1;
-            }
-          }
-        })
-        .slice();
-    } else {
-      setProjRef(
-        projectsCopy.filter((project) => {
-          return project.ProjectId == params.id;
-        })
-      );
-      sortedProjects = projectsFiltered
-        .sort((a, b) => {
-          console.log(a[sorting.field]);
-          console.log(typeof b[sorting.field]);
-          if (typeof b[sorting.field] == "string") {
-            if (b) {
-              return a ? b[sorting.field]?.localeCompare(a[sorting.field]) : 1;
-            } else if (a) {
-              return b ? a[sorting.field]?.localeCompare(b[sorting.field]) : -1;
-            }
-          } else if (typeof b[sorting.field] == "number") {
-            if (b) {
-              return a ? b[sorting.field] - a[sorting.field] : 1;
-            } else if (a) {
-              return b ? a[sorting.field] - b[sorting.field] : -1;
-            }
-          }
-        })
-        .slice();
-    }
-    // Replace currentprojects with sorted currentprojects
-    setProjects(
-      // Decide either currentprojects sorted by ascending or descending order
-      sorting.ascending ? sortedProjects : sortedProjects.reverse()
-    );
-  }, [data, sorting, undo]);
-  useEffect(() => {
-    if (data.length > projects.length && projects.length != 0) {
-      notify();
-      //   console.log(data.length)
-      // console.log(projects.length)
-    }
-  }, [projects]);
-  //Toast Message is created to allow users to undo deletion of project
-  const notify = () => {
-    toast.info(undoToastBtn, options);
+    return {
+      labels: labels,
+      datasets: [
+        {
+          label: "Days left",
+          data: data,
+          backgroundColor: ["#5463FF"],
+        },
+      ],
+    };
   };
-  const undoToastBtn = () => (
-    <button
-      ref={countRef}
-      onClick={() => {
-        setUndo(true);
-        const proj = {
-          ProjectName: projRef[0].ProjectName,
-          ProjectDescription: projRef[0].ProjectDescription,
-          ProjectBudget: projRef[0].ProjectBudget,
-          ProjectStartDate: projRef[0].ProjectStartDate,
-          ProjectEndDate: projRef[0].ProjectEndDate,
-          ProjectStatus: projRef[0].ProjectStatus,
-          ProjectCompletionDate: projRef[0].ProjectCompletionDate,
-          ProjectVolunteer: projRef[0].ProjectVolunteer,
-          ServiceCenterId: projRef[0].ServiceCenterId,
-        };
-        console.log(proj);
-        handleCreate(proj);
-        routeReturn();
-      }}
-    >
-      Undo
-    </button>
-  );
-
-  const handleCreate = async (proj) => await createFn(proj);
-
-  function applySorting(key, ascending) {
-    setSorting({ field: key, ascending: ascending });
-  }
-
-  console.log(projects);
   return (
-    <>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th onClick={() => applySorting("ProjectName", !sorting.ascending)}>
-              Project Name
-            </th>
-            <th
-              colSpan={2}
-              onClick={() =>
-                applySorting("ProjectDescription", !sorting.ascending)
-              }
-            >
-              Project Description
-            </th>
-
-            <th
-              onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
-            >
-              Project Budget
-            </th>
-            <th
-              onClick={() =>
-                applySorting("ProjectStartDate", !sorting.ascending)
-              }
-            >
-              Start Date
-            </th>
-            <th
-              onClick={() => applySorting("ProjectEndDate", !sorting.ascending)}
-            >
-              End Date
-            </th>
-            <th
-              onClick={() => applySorting("ProjectStatus", !sorting.ascending)}
-            >
-              Project Status
-            </th>
-          </tr>
-        </thead>
-        {projects.map((item, key) => {
-          console.log(item);
-          return (
-            <tbody key={key}>
-              <tr>
-                <td>{key + 1}</td>
-                <td>{item.ProjectName}</td>
-                <td colSpan={2}>
-                  <>
-                    {item.ProjectDescription}
-                    {/* {JSON.parse(item.ProjectVolunteer || "[]")?.length > 0 ? (
-                      <div className="mt-2">
-                        <b>Volunteers: </b>
-                        {JSON.parse(item.ProjectVolunteer || "[]")?.map((item) => (
-                          <span>
-                            {item?.username} <span></span>
-                          </span>
-                        )) || "N/A"}
-                      </div>
-                    ) : null} */}
-                  </>
-                </td>
-
-                <td>{item.ProjectBudget ? item.ProjectBudget : "Not Set"}</td>
-                <td>{item.ProjectStartDate}</td>
-                <td>{item.ProjectEndDate}</td>
-                <td>{item.ProjectStatus}</td>
-                <td>
-                  <button onClick={() => routeChange(item.ProjectId)}>
-                    View
-                  </button>
-                  {/* <button onClick={() => setUndo(true)}>Undo</button> */}
-                </td>
-              </tr>
-            </tbody>
-          );
-        })}
-      </Table>
-      <ToastContainer theme="dark" />
-    </>
+    <div id="pdffile">
+      <section class="report-dashboard">
+        <div class="row">
+          <div class="flex-container">
+            <div class="report-dashboard-item">
+              {/* {console.log(projects.ProjectId)} */}
+              <div
+                style={{
+                  width: 600,
+                  height: 600,
+                  overflow: "auto",
+                  margin: "auto",
+                }}
+              >
+                <Pie data={getChartData3(projects)} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="report-dashboard">
+        <div class="row">
+          <div class="flex-container">
+            <div class="report-dashboard-item">
+              <div
+                style={{
+                  width: 600,
+                  height: 600,
+                  overflow: "auto",
+                  margin: "auto",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Bar data={getChartData4(projects, timelines)} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
+export const CreateButton = (props) => {
+  const exportPDF = () => {
+    const report = new JsPDF("portrait", "pt", "a4");
+    report.html(document.getElementById("pdffile")).then(() => {
+      report.save("Default.pdf");
+    });
+  };
+  return <StdButton onClick={() => exportPDF()}>Generate PDF</StdButton>;
+};
 class ViewManagement extends React.Component {
   state = {
     drawerOpen: false,
@@ -1493,6 +1170,8 @@ class ViewManagement extends React.Component {
           <ListTable settings={this.settings}>
             <HeaderRow>
               {Object.keys(this.props.headers).map((key, index) => {
+                console.log(key, index);
+                console.log(this.props.headers[key].displayHeader);
                 return (
                   <Cell width={"100%"} key={index}>
                     {this.props.headers[key].displayHeader}
