@@ -28,14 +28,14 @@ namespace YouthActionDotNet.Models
 
         // public double ProjectBudget { get; set; }
 
-        public string ServiceCenterId {get; set;}
-        public string TimelineId {get; set;}
-        public string BudgetId {get; set;}
+        public string ServiceCenterId { get; set; }
+        public string TimelineId { get; set; }
+        public string BudgetId { get; set; }
         [JsonIgnore]
-        public virtual ServiceCenter ServiceCenter { get; set;}
+        public virtual ServiceCenter ServiceCenter { get; set; }
         [JsonIgnore]
-        public virtual Timeline Timeline { get; set;}
+        public virtual Timeline Timeline { get; set; }
         [JsonIgnore]
-        public virtual Budget Budget { get; set;}
+        public virtual Budget Budget { get; set; }
     }
 }

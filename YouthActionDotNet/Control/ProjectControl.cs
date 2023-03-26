@@ -47,7 +47,6 @@ namespace YouthActionDotNet.Control
 
         public async Task<ActionResult<string>> Create(Project template)
         {
-
             Timeline timeline = new Timeline();
             Budget budget = new Budget();
             template.TimelineId = timeline.TimelineId;
@@ -150,7 +149,6 @@ namespace YouthActionDotNet.Control
             var projects = await ProjectRepositoryOut.GetAllAsync();
             return JsonConvert.SerializeObject(new { success = true, data = projects, message = "Projects Successfully Retrieved" });
         }
-
 
         //------------------------------------------------------TO BE UPDATED---------------------------------------------------//
         public async Task<ActionResult<string>> GetProjectByTag(string tag)
@@ -274,7 +272,9 @@ namespace YouthActionDotNet.Control
             settings.ColumnSettings.Add("ProjectId", new ColumnHeader { displayHeader = "Project Id" });
             settings.ColumnSettings.Add("ProjectName", new ColumnHeader { displayHeader = "Project Name" });
             settings.ColumnSettings.Add("ProjectDescription", new ColumnHeader { displayHeader = "Project Description" });
+
             // settings.ColumnSettings.Add("ProjectStartDate", new ColumnHeader { displayHeader = "Project Start Date" });
+
             // settings.ColumnSettings.Add("ProjectEndDate", new ColumnHeader { displayHeader = "Project End Date" });
             // settings.ColumnSettings.Add("ProjectCompletionDate", new ColumnHeader { displayHeader = "Project Completion Date" });
             settings.ColumnSettings.Add("ProjectStatus", new ColumnHeader { displayHeader = "Project Status" });
@@ -285,6 +285,8 @@ namespace YouthActionDotNet.Control
             settings.FieldSettings.Add("ProjectId", new InputType { type = "text", displayLabel = "Project Id", editable = false, primaryKey = true });
             settings.FieldSettings.Add("ProjectName", new InputType { type = "text", displayLabel = "Project Name", editable = true, primaryKey = false });
             settings.FieldSettings.Add("ProjectDescription", new InputType { type = "text", displayLabel = "Project Description", editable = true, primaryKey = false });
+
+
             // settings.FieldSettings.Add("ProjectStartDate", new InputType { type = "datetime", displayLabel = "Project Start Date", editable = true, primaryKey = false });
             // settings.FieldSettings.Add("ProjectEndDate", new InputType { type = "datetime", displayLabel = "Project End Date", editable = true, primaryKey = false });
             // settings.FieldSettings.Add("ProjectCompletionDate", new InputType { type = "datetime", displayLabel = "Project Completion Date", editable = true, primaryKey = false });

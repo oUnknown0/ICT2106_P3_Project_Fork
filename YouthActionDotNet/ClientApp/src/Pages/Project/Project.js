@@ -30,9 +30,12 @@ export default class Project extends React.Component {
     content: null,
     pinned: null,
     archived: null,
+    timeline: null,
+    budget: null,
     headers: [],
     loading: true,
     settings: {},
+    settingsTimeline: {},
     error: "",
     allContent: null,
   };
@@ -45,6 +48,15 @@ export default class Project extends React.Component {
     textColorInvert: "#606060",
     api: "/api/Project/",
   };
+  settingsTimeline = {
+    title: "Timeline",
+    primaryColor: "#a6192e",
+    accentColor: "#94795d",
+    textColor: "#ffffff",
+    textColorInvert: "#606060",
+    api: "/api/Timeline/",
+  };
+
   has = {
     Create: true,
     Generate: false,
@@ -72,6 +84,18 @@ export default class Project extends React.Component {
         archived: archived,
       });
     });
+    await this.getTimeline().then((data) => {
+      console.log(data);
+      this.setState({
+        timeline: data,
+      });
+    });
+    await this.getBudget().then((data) => {
+      console.log(data);
+      this.setState({
+        budget: data,
+      });
+    });
     //-------------------------------------------TO BE UPDATED---------------------------------------//
 
     await this.getContent().then((content) => {
@@ -85,6 +109,12 @@ export default class Project extends React.Component {
       console.log(settings);
       this.setState({
         settings: settings,
+      });
+    });
+    await this.getSettingsTimeline().then((settings) => {
+      console.log(settings);
+      this.setState({
+        settingsTimeline: settings,
       });
     });
 
@@ -103,6 +133,7 @@ export default class Project extends React.Component {
         ? reformattedPerms.push(perm)
         : null;
     });
+
     this.setState({
       data: this.props.data,
       perms: perms,
@@ -149,6 +180,30 @@ export default class Project extends React.Component {
 
   getArchived = async () => {
     return fetch(this.settings.api + "GetProjectArchived", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      console.log(res);
+      //Res = {success: true, message: "Success", data: Array(3)}
+      return res.json();
+    });
+  };
+  getTimeline = async () => {
+    return fetch(this.settings.api + "Timeline", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      console.log(res);
+      //Res = {success: true, message: "Success", data: Array(3)}
+      return res.json();
+    });
+  };
+  getBudget = async () => {
+    return fetch(this.settings.api + "Budget", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -424,6 +479,18 @@ export default class Project extends React.Component {
       return res.json();
     });
   };
+  getSettingsTimeline = async () => {
+    // fetches http://...:5001/api/User/Settings
+    return fetch(this.settingsTimeline.api + "Settings", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => {
+      console.log(res);
+      return res.json();
+    });
+  };
 
   getContent = async () => {
     return fetch(this.settings.api + "All", {
@@ -525,24 +592,10 @@ export default class Project extends React.Component {
     if (this.state.loading) {
       return <Loading></Loading>;
     } else {
+      console.log(this.state.settings);
+      console.log(this.state.settings.data.ColumnSettings);
+      console.log(this.state.settingsTimeline.data.ColumnSettings);
       console.log(this.state.archived.data);
-      // const object = this.state.settings.data.ColumnSettings;
-      // const picked = (({
-      //   ProjectName,
-      //   ProjectDescription,
-      //   ProjectBudget,
-      //   ProjectStartDate,
-      //   ProjectEndDate,
-      //   ProjectStatus,
-      // }) => ({
-      //   ProjectName,
-      //   ProjectDescription,
-      //   ProjectBudget,
-      //   ProjectStartDate,
-      //   ProjectEndDate,
-      //   ProjectStatus,
-      // }))(object);
-      // console.log(object);
       return (
         <>
           <DatapageLayout
@@ -597,7 +650,7 @@ const DisplayTables = (props) => {
   const createFn = props.create;
   let navigate = useNavigate();
   const routeChange = (id) => {
-    let path = `/Project/Edit/${id}`;
+    let path = `/Project/View/${id}`;
     navigate(path);
   };
   const routeReturn = () => {
@@ -658,10 +711,10 @@ const DisplayTables = (props) => {
       );
     });
 
-    console.log(`Filtered: ${projectsFiltered}`);
-    console.log(`Pinned: ${projectsPinned}`);
-    console.log(`Archived: ${projectsArchived}`);
-    console.log(`Other: ${projectsOther}`);
+    // console.log(`Filtered: ${projectsFiltered}`);
+    // console.log(`Pinned: ${projectsPinned}`);
+    // console.log(`Archived: ${projectsArchived}`);
+    // console.log(`Other: ${projectsOther}`);
 
     setArchiveProjects(projectsArchived);
     setPinnedProjects(projectsPinned);
@@ -742,9 +795,10 @@ const DisplayTables = (props) => {
           ProjectBudget: projRef[0].ProjectBudget,
           ProjectStartDate: projRef[0].ProjectStartDate,
           ProjectEndDate: projRef[0].ProjectEndDate,
-          ProjectStatus: projRef[0].ProjectStatus,
           ProjectCompletionDate: projRef[0].ProjectCompletionDate,
           ProjectVolunteer: projRef[0].ProjectVolunteer,
+          ProjectStatus: projRef[0].ProjectStatus,
+          // ProjectType: projRef[0].ProjectType,
           ServiceCenterId: projRef[0].ServiceCenterId,
         };
         console.log(proj);
@@ -811,7 +865,11 @@ const ProjectTable = (props) => {
             >
               Project Description
             </th>
-            <th onClick={() => applySorting("ProjectVolunteer", !sorting.ascending)}>
+            <th
+              onClick={() =>
+                applySorting("ProjectVolunteer", !sorting.ascending)
+              }
+            >
               Project Type
             </th>
             <th
@@ -836,6 +894,7 @@ const ProjectTable = (props) => {
             >
               Project Status
             </th>
+            <th>Action</th>
           </tr>
         </thead>
         {projects.map((item, key) => {
@@ -859,8 +918,8 @@ const ProjectTable = (props) => {
                     ) : null} */}
                   </>
                 </td>
-                <td>{item.ProjectVolunteer}</td>
-                <td>{item.ProjectBudget}</td>
+                {/* <td>{item.ProjectVolunteer}</td> */}
+                <td>{item.ProjectBudget ? item.ProjectBudget : "Not set"}</td>
                 <td>{item.ProjectStartDate}</td>
                 <td>{item.ProjectEndDate}</td>
                 <td>{item.ProjectStatus}</td>
@@ -886,7 +945,7 @@ const PinnedProjectTable = (props) => {
   const createFn = props.create;
   let navigate = useNavigate();
   const routeChange = (id) => {
-    let path = `/Project/Edit/${id}`;
+    let path = `/Project/View/${id}`;
     navigate(path);
   };
   const routeReturn = () => {
@@ -1046,7 +1105,11 @@ const PinnedProjectTable = (props) => {
             >
               Project Description
             </th>
-            <th onClick={() => applySorting("ProjectVolunteer", !sorting.ascending)}>
+            <th
+              onClick={() =>
+                applySorting("ProjectVolunteer", !sorting.ascending)
+              }
+            >
               Project Type
             </th>
             <th
@@ -1121,7 +1184,7 @@ const ArchivedTable = (props) => {
   const createFn = props.create;
   let navigate = useNavigate();
   const routeChange = (id) => {
-    let path = `/Project/Edit/${id}`;
+    let path = `/Project/View/${id}`;
     navigate(path);
   };
   const routeReturn = () => {
@@ -1306,6 +1369,7 @@ const ArchivedTable = (props) => {
           </tr>
         </thead>
         {projects.map((item, key) => {
+          console.log(item);
           return (
             <tbody key={key}>
               <tr>
@@ -1327,7 +1391,7 @@ const ArchivedTable = (props) => {
                   </>
                 </td>
 
-                <td>{item.ProjectBudget}</td>
+                <td>{item.ProjectBudget ? item.ProjectBudget : "Not Set"}</td>
                 <td>{item.ProjectStartDate}</td>
                 <td>{item.ProjectEndDate}</td>
                 <td>{item.ProjectStatus}</td>
