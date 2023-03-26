@@ -698,28 +698,6 @@ const DisplayTables = (props) => {
       return project.ProjectId != params.id;
     });
 
-    const projectsPinned = projectsFiltered.filter((project) => {
-      return project.ProjectStatus == "Pinned";
-    });
-
-    const projectsArchived = projectsFiltered.filter((project) => {
-      return project.ProjectStatus == "Archived";
-    });
-
-    const projectsOther = projectsFiltered.filter((project) => {
-      return (
-        !projectsArchived.includes(project) && !projectsPinned.includes(project)
-      );
-    });
-
-    // console.log(`Filtered: ${projectsFiltered}`);
-    // console.log(`Pinned: ${projectsPinned}`);
-    // console.log(`Archived: ${projectsArchived}`);
-    // console.log(`Other: ${projectsOther}`);
-
-    setArchiveProjects(projectsArchived);
-    setPinnedProjects(projectsPinned);
-    setOtherProjects(projectsOther);
     // Apply sorting
     let sortedProjects = [];
     if (undo == true) {
@@ -769,6 +747,30 @@ const DisplayTables = (props) => {
         .slice();
     }
     // Replace currentprojects with sorted currentprojects
+
+    const projectsPinned = sortedProjects.filter((project) => {
+      return project.ProjectStatus == "Pinned";
+    });
+
+    const projectsArchived = sortedProjects.filter((project) => {
+      return project.ProjectStatus == "Archived";
+    });
+
+    const projectsOther = sortedProjects.filter((project) => {
+      return (
+        !projectsArchived.includes(project) && !projectsPinned.includes(project)
+      );
+    });
+
+    setArchiveProjects(
+      sorting.ascending ? projectsArchived : projectsArchived.reverse()
+    );
+    setPinnedProjects(
+      sorting.ascending ? projectsPinned : projectsPinned.reverse()
+    );
+    setOtherProjects(
+      sorting.ascending ? projectsOther : projectsOther.reverse()
+    );
     setProjects(
       // Decide either currentprojects sorted by ascending or descending order
       sorting.ascending ? sortedProjects : sortedProjects.reverse()
@@ -875,9 +877,10 @@ const ProjectTable = (props) => {
             </th>
             <th
               colSpan={2}
-              onClick={() =>
-                applySorting("ProjectDescription", !sorting.ascending)
-              }
+              onClick={() => {
+                console.log(sorting);
+                return applySorting("ProjectDescription", !sorting.ascending);
+              }}
             >
               Project Description
             </th>
@@ -920,8 +923,8 @@ const ProjectTable = (props) => {
           let timelineItem = timelines.find(
             (timeline) => timeline.TimelineId == item.TimelineId
           );
-          console.log(timelineItem);
-          console.log(budgetItem);
+          // console.log(timelineItem);
+          // console.log(budgetItem);
           return (
             <tbody key={key}>
               <tr>
