@@ -739,6 +739,7 @@ const DisplayTables = (props) => {
         const proj = {
           ProjectName: projRef[0].ProjectName,
           ProjectDescription: projRef[0].ProjectDescription,
+          ProjectType: projRef[0].ProjectType,
           ProjectBudget: projRef[0].ProjectBudget,
           ProjectStartDate: projRef[0].ProjectStartDate,
           ProjectEndDate: projRef[0].ProjectEndDate,
@@ -811,7 +812,9 @@ const ProjectTable = (props) => {
             >
               Project Description
             </th>
-
+            <th onClick={() => applySorting("ProjectType", !sorting.ascending)}>
+              Project Type
+            </th>
             <th
               onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
             >
@@ -857,7 +860,7 @@ const ProjectTable = (props) => {
                     ) : null} */}
                   </>
                 </td>
-
+                <td>{item.ProjectType}</td>
                 <td>{item.ProjectBudget}</td>
                 <td>{item.ProjectStartDate}</td>
                 <td>{item.ProjectEndDate}</td>
@@ -1002,6 +1005,7 @@ const PinnedProjectTable = (props) => {
         const proj = {
           ProjectName: projRef[0].ProjectName,
           ProjectDescription: projRef[0].ProjectDescription,
+          ProjectType: projRef[0].ProjectType,
           ProjectBudget: projRef[0].ProjectBudget,
           ProjectStartDate: projRef[0].ProjectStartDate,
           ProjectEndDate: projRef[0].ProjectEndDate,
@@ -1043,7 +1047,9 @@ const PinnedProjectTable = (props) => {
             >
               Project Description
             </th>
-
+            <th onClick={() => applySorting("ProjectType", !sorting.ascending)}>
+              Project Type
+            </th>
             <th
               onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
             >

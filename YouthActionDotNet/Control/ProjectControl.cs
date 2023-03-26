@@ -280,6 +280,7 @@ namespace YouthActionDotNet.Control
             settings.ColumnSettings.Add("ProjectStatus", new ColumnHeader { displayHeader = "Project Status" });
             //settings.ColumnSettings.Add("ProjectBudget", new ColumnHeader { displayHeader = "Project Budget" });
             settings.ColumnSettings.Add("ServiceCenterId", new ColumnHeader { displayHeader = "Service Center Id" });
+            settings.ColumnSettings.Add("ProjectType", new ColumnHeader { displayHeader = "Project Type" });
 
             settings.FieldSettings.Add("ProjectId", new InputType { type = "text", displayLabel = "Project Id", editable = false, primaryKey = true });
             settings.FieldSettings.Add("ProjectName", new InputType { type = "text", displayLabel = "Project Name", editable = true, primaryKey = false });
@@ -289,6 +290,7 @@ namespace YouthActionDotNet.Control
             // settings.FieldSettings.Add("ProjectCompletionDate", new InputType { type = "datetime", displayLabel = "Project Completion Date", editable = true, primaryKey = false });
             settings.FieldSettings.Add("ProjectStatus", new InputType { type = "text", displayLabel = "Project Status", editable = true, primaryKey = false });
             //settings.FieldSettings.Add("ProjectBudget", new InputType { type = "number", displayLabel = "Project Budget", editable = true, primaryKey = false });
+            settings.FieldSettings.Add("ProjectType", new InputType { type = "text", displayLabel = "Project Type", editable = true, primaryKey = false });
 
             var serviceCenters = ServiceCenterRepositoryOut.GetAll();
             settings.FieldSettings.Add("ServiceCenterId", new DropdownInputType
