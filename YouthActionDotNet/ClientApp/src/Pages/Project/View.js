@@ -126,29 +126,38 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
 //feedback word cloud for feedback text
 const FeedbackWordCloud = ({ feedbackTextData }) => {
   const svgRef = useRef();
-
-  const allFeedbackText = Object.values(feedbackTextData).flat();
-
-  const words = allFeedbackText.reduce((acc, feedbackText) => {
-    const wordsInText = feedbackText.split(/\s+/);
-    wordsInText.forEach((word) => {
-      const cleanedWord = word.replace(/[^\w]/g, '').toLowerCase();
-      if (cleanedWord) {
-        if (acc[cleanedWord]) {
-          acc[cleanedWord]++;
-        } else {
-          acc[cleanedWord] = 1;
-        }
-      }
-    });
-    return acc;
-  }, {});
-
-  const wordArray = Object.keys(words).map((word) => {
-    return { text: word, size: words[word] * 20 };
-  });
+  const [wordArray, setWordArray] = useState([]);
 
   useEffect(() => {
+    const allFeedbackText = Object.values(feedbackTextData).flat();
+
+    const words = allFeedbackText.reduce((acc, feedbackText) => {
+      const wordsInText = feedbackText.split(/\s+/);
+      wordsInText.forEach((word) => {
+        const cleanedWord = word.replace(/[^\w]/g, '').toLowerCase();
+        if (cleanedWord) {
+          if (acc[cleanedWord]) {
+            acc[cleanedWord]++;
+          } else {
+            acc[cleanedWord] = 1;
+          }
+        }
+      });
+      return acc;
+    }, {});
+
+    const newWordArray = Object.keys(words).map((word) => {
+      return { text: word, size: words[word] * 20 };
+    });
+
+    setWordArray(newWordArray);
+  }, [feedbackTextData]);
+
+
+  useEffect(() => {
+    if (!wordArray.length) {
+      return;
+    }
     const drawWordCloud = (words) => {
       const width = 1580;
       const height = 160;
@@ -167,6 +176,8 @@ const FeedbackWordCloud = ({ feedbackTextData }) => {
       layout.start();
 
       function draw(words) {
+        svg.selectAll('g').remove(); // Clear the previous words
+
         svg
           .append('g')
           .attr('transform', `translate(${layout.size()[0] / 2 + 60}, ${layout.size()[1] / 2})`)
@@ -180,6 +191,7 @@ const FeedbackWordCloud = ({ feedbackTextData }) => {
           .attr('transform', (d) => `translate(${[d.x, d.y]})`) // Removed rotation
           .text((d) => d.text);
       }
+
     };
 
     drawWordCloud(wordArray);
