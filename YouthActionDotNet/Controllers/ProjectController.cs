@@ -78,5 +78,59 @@ namespace YouthActionDotNet.Controllers
         {
             return projectControl.Settings();
         }
+
+
+//---------------------------------------------TO BE UPDATED----------------------------------//
+        [HttpGet("GetProjectByTag/{tag}")]
+        public async Task<ActionResult<string>> GetProjectByTag(string tag)
+        {
+            Console.WriteLine("GetProjectByTag");
+            Console.WriteLine(tag);
+            return await projectControl.GetProjectByTag(tag);
+        }
+        [HttpGet("GetProjectInProgress")]
+        public async Task<ActionResult<string>> GetProjectInProgress()
+        {
+            Console.WriteLine("GetProjectInProgress");
+            return await projectControl.GetProjectInProgress();
+        }
+        [HttpGet("GetProjectPinned")]
+        public async Task<ActionResult<string>> GetProjectPinned()
+        {
+            Console.WriteLine("GetProjectPinned");
+            return await projectControl.GetProjectPinned();
+        }
+        [HttpGet("GetProjectArchived")]
+        public async Task<ActionResult<string>> GetProjectArchived()
+        {
+            Console.WriteLine("GetProjectArchived");
+            return await projectControl.GetProjectArchived();
+        }
+        
+        [HttpPut("UpdateStatusToPinned/{id}")]
+        public async Task<ActionResult<string>> UpdateStatusToPinned(string id, Project template)
+        {
+            return await projectControl.UpdateStatusToPinned(id, template);
+        }
+
+
+        [HttpPut("UpdateStatusToArchive/{id}")]
+        public async Task<ActionResult<string>> UpdateStatusToArchive(string id, Project template)
+        {
+            return await projectControl.UpdateStatusToArchive(id, template);
+        }
+
+
+        [HttpPut("UpdateStatusToInProgress/{id}")]
+        public async Task<ActionResult<string>> UpdateStatusToInProgress(string id, Project template)
+        {
+            return await projectControl.UpdateStatusToInProgress(id, template);
+        }
+
+
+
+        //---------------------------------------------TO BE UPDATED----------------------------------//
+
+
     }
 }

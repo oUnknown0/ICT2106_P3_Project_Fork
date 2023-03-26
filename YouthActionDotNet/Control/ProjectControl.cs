@@ -18,15 +18,26 @@ namespace YouthActionDotNet.Control
         private GenericRepositoryOut<Project> ProjectRepositoryOut;
         private GenericRepositoryIn<ServiceCenter> ServiceCenterRepositoryIn;
         private GenericRepositoryOut<ServiceCenter> ServiceCenterRepositoryOut;
-
+        private GenericRepositoryIn<Timeline> TimelineRepositoryIn;
+        private GenericRepositoryIn<Budget> BudgetRepositoryIn;
+        //-------------------------------------------------TO BE UPDATED------------------------------------------------//
+        private ProjectRepositoryIn ProjectsRepositoryIn;
+        private ProjectRepositoryOut ProjectsRepositoryOut;
+        //-------------------------------------------------TO BE UPDATED------------------------------------------------//
         JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
         public ProjectControl(DBContext context)
         {
+            //-------------------------------------------------TO BE UPDATED------------------------------------------------//
+            ProjectsRepositoryIn = new ProjectRepositoryIn(context);
+            ProjectsRepositoryOut = new ProjectRepositoryOut(context);
+            //-------------------------------------------------TO BE UPDATED------------------------------------------------//
             ProjectRepositoryIn = new GenericRepositoryIn<Project>(context);
             ProjectRepositoryOut = new GenericRepositoryOut<Project>(context);
             ServiceCenterRepositoryIn = new GenericRepositoryIn<ServiceCenter>(context);
             ServiceCenterRepositoryOut = new GenericRepositoryOut<ServiceCenter>(context);
+            TimelineRepositoryIn = new GenericRepositoryIn<Timeline>(context);
+            BudgetRepositoryIn = new GenericRepositoryIn<Budget>(context);
         }
 
         public bool Exists(string id)
@@ -36,7 +47,14 @@ namespace YouthActionDotNet.Control
 
         public async Task<ActionResult<string>> Create(Project template)
         {
-
+            Timeline timeline = new Timeline();
+            Budget budget = new Budget();
+            template.TimelineId = timeline.TimelineId;
+            template.BudgetId = budget.BudgetId;
+            template.Timeline = timeline;
+            template.Budget = budget;
+            await TimelineRepositoryIn.InsertAsync(timeline);
+            await BudgetRepositoryIn.InsertAsync(budget);
             var project = await ProjectRepositoryIn.InsertAsync(template);
             return JsonConvert.SerializeObject(new { success = true, message = "Project Created", data = project }, settings);
         }
@@ -107,6 +125,8 @@ namespace YouthActionDotNet.Control
             {
                 return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
             }
+            await BudgetRepositoryIn.DeleteAsync(project.BudgetId);
+            await TimelineRepositoryIn.DeleteAsync(project.TimelineId);
             await ProjectRepositoryIn.DeleteAsync(id);
             return JsonConvert.SerializeObject(new { success = true, data = "", message = "Project Successfully Deleted" });
         }
@@ -118,6 +138,8 @@ namespace YouthActionDotNet.Control
             {
                 return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
             }
+            await BudgetRepositoryIn.DeleteAsync(template.BudgetId);
+            await TimelineRepositoryIn.DeleteAsync(template.TimelineId);
             await ProjectRepositoryIn.DeleteAsync(template);
             return JsonConvert.SerializeObject(new { success = true, data = "", message = "Project Successfully Deleted" });
         }
@@ -128,6 +150,119 @@ namespace YouthActionDotNet.Control
             return JsonConvert.SerializeObject(new { success = true, data = projects, message = "Projects Successfully Retrieved" });
         }
 
+        //------------------------------------------------------TO BE UPDATED---------------------------------------------------//
+        public async Task<ActionResult<string>> GetProjectByTag(string tag)
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectByTag(tag);
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Tag Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Tag Successfully Retrieved" }, settings);
+        }
+        public async Task<ActionResult<string>> GetProjectInProgress()
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectInProgress();
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Test Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Test Successfully Retrieved" }, settings);
+        }
+        public async Task<ActionResult<string>> GetProjectPinned()
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectPinned();
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Test Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Test Successfully Retrieved" }, settings);
+        }
+        public async Task<ActionResult<string>> GetProjectArchived()
+        {
+            var projectByTag = await ProjectsRepositoryOut.GetProjectArchived();
+            if (projectByTag == null)
+            {
+                return JsonConvert.SerializeObject(new { success = false, message = "Test Not Found" }, settings);
+            }
+            return JsonConvert.SerializeObject(new { success = true, data = projectByTag, message = "Test Successfully Retrieved" }, settings);
+        }
+
+        public async Task<ActionResult<string>> UpdateStatusToPinned(string id, Project template)
+        {
+            if (id != template.ProjectId)
+            {
+                return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Id Mismatch" });
+            }
+            await ProjectsRepositoryIn.UpdateStatusToPinned(template);
+            try
+            {
+                return JsonConvert.SerializeObject(new { success = true, data = template, message = "Project Successfully Updated" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Exists(id))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        public async Task<ActionResult<string>> UpdateStatusToArchive(string id, Project template)
+        {
+            if (id != template.ProjectId)
+            {
+                return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Id Mismatch" });
+            }
+            await ProjectsRepositoryIn.UpdateStatusToArchive(template);
+            try
+            {
+                return JsonConvert.SerializeObject(new { success = true, data = template, message = "Project Successfully Updated" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Exists(id))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+
+        public async Task<ActionResult<string>> UpdateStatusToInProgress(string id, Project template)
+        {
+            if (id != template.ProjectId)
+            {
+                return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Id Mismatch" });
+            }
+            await ProjectsRepositoryIn.UpdateStatusToInProgress(template);
+            try
+            {
+                return JsonConvert.SerializeObject(new { success = true, data = template, message = "Project Successfully Updated" });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Exists(id))
+                {
+                    return JsonConvert.SerializeObject(new { success = false, data = "", message = "Project Not Found" });
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        //------------------------------------------------------TO BE UPDATED---------------------------------------------------//
+
         public string Settings()
         {
             Settings settings = new Settings();
@@ -137,21 +272,17 @@ namespace YouthActionDotNet.Control
             settings.ColumnSettings.Add("ProjectId", new ColumnHeader { displayHeader = "Project Id" });
             settings.ColumnSettings.Add("ProjectName", new ColumnHeader { displayHeader = "Project Name" });
             settings.ColumnSettings.Add("ProjectDescription", new ColumnHeader { displayHeader = "Project Description" });
-            // settings.ColumnSettings.Add("ProjectStartDate", new ColumnHeader { displayHeader = "Project Start Date" });
-            // settings.ColumnSettings.Add("ProjectEndDate", new ColumnHeader { displayHeader = "Project End Date" });
-            // settings.ColumnSettings.Add("ProjectCompletionDate", new ColumnHeader { displayHeader = "Project Completion Date" });
+
+            // settings.ColumnSettings.Add("ProjectVolunteer", new ColumnHeader { displayHeader = "Project Volunteer" });
             settings.ColumnSettings.Add("ProjectStatus", new ColumnHeader { displayHeader = "Project Status" });
-            //settings.ColumnSettings.Add("ProjectBudget", new ColumnHeader { displayHeader = "Project Budget" });
             settings.ColumnSettings.Add("ServiceCenterId", new ColumnHeader { displayHeader = "Service Center Id" });
+            settings.ColumnSettings.Add("ProjectType", new ColumnHeader { displayHeader = "Project Type" });
 
             settings.FieldSettings.Add("ProjectId", new InputType { type = "text", displayLabel = "Project Id", editable = false, primaryKey = true });
             settings.FieldSettings.Add("ProjectName", new InputType { type = "text", displayLabel = "Project Name", editable = true, primaryKey = false });
             settings.FieldSettings.Add("ProjectDescription", new InputType { type = "text", displayLabel = "Project Description", editable = true, primaryKey = false });
-            // settings.FieldSettings.Add("ProjectStartDate", new InputType { type = "datetime", displayLabel = "Project Start Date", editable = true, primaryKey = false });
-            // settings.FieldSettings.Add("ProjectEndDate", new InputType { type = "datetime", displayLabel = "Project End Date", editable = true, primaryKey = false });
-            // settings.FieldSettings.Add("ProjectCompletionDate", new InputType { type = "datetime", displayLabel = "Project Completion Date", editable = true, primaryKey = false });
             settings.FieldSettings.Add("ProjectStatus", new InputType { type = "text", displayLabel = "Project Status", editable = true, primaryKey = false });
-            //settings.FieldSettings.Add("ProjectBudget", new InputType { type = "number", displayLabel = "Project Budget", editable = true, primaryKey = false });
+            // settings.FieldSettings.Add("ProjectType", new InputType { type = "text", displayLabel = "Project Type", editable = true, primaryKey = false });
 
             var serviceCenters = ServiceCenterRepositoryOut.GetAll();
             settings.FieldSettings.Add("ServiceCenterId", new DropdownInputType

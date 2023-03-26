@@ -465,7 +465,7 @@ class HeaderExpansion extends React.Component {
     return this.state.expanded ? (
       <HeaderExpansionPane
         handleClose={this.props.handleClose}
-        title={this.props.actions[this.state.currentStep].label}
+        // title={this.props.actions[this.state.currentStep].label}
       >
         <MultiStepBox
           currentStep={this.state.currentStep}
