@@ -752,19 +752,29 @@ const DisplayTables = (props) => {
     }
     // Replace currentprojects with sorted currentprojects
 
+    // const projectsPinned = sortedProjects.filter((project) => {
+    //   return project.ProjectStatus == "Pinned";
+    // });
+
+    // const projectsArchived = sortedProjects.filter((project) => {
+    //   return project.ProjectStatus == "Archived";
+    // });
     const projectsPinned = sortedProjects.filter((project) => {
-      return project.ProjectStatus == "Pinned";
+      return project.ProjectViewStatus == "Pinned";
     });
 
     const projectsArchived = sortedProjects.filter((project) => {
-      return project.ProjectStatus == "Archived";
+      return project.ProjectViewStatus == "Archived";
     });
 
     const projectsOther = sortedProjects.filter((project) => {
-      return (
-        !projectsArchived.includes(project) && !projectsPinned.includes(project)
-      );
+      return project.ProjectViewStatus == "None" || project.ProjectViewStatus == null;
     });
+    // const projectsOther = sortedProjects.filter((project) => {
+    //   return (
+    //     !projectsArchived.includes(project) && !projectsPinned.includes(project)
+    //   );
+    // });
 
     setArchiveProjects(
       sorting.ascending ? projectsArchived : projectsArchived.reverse()
@@ -1026,10 +1036,10 @@ const GenerateChart = (props) => {
   }, []);
   const getChartData3 = (projects) => {
     const inProgress = projects.filter((project) => {
-      return project.ProjectStatus !== "Archived";
+      return project.ProjectStatus === "In progress";
     }).length;
     const completed = projects.filter((project) => {
-      return project.ProjectStatus === "Archived";
+      return project.ProjectStatus === "Completed";
     }).length;
     console.log(completed);
     return {
@@ -1046,7 +1056,7 @@ const GenerateChart = (props) => {
   const getChartData4 = (projects, timelines) => {
     const now = new Date();
     const inProgress = projects.filter((project) => {
-      return project.ProjectStatus !== "Archived";
+      return project.ProjectStatus === "In progress";
     });
     const data = inProgress.map((project) => {
       const timeline = timelines.find(

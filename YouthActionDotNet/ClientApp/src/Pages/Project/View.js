@@ -661,7 +661,7 @@ const ProjectTable = (props) => {
     const res = await axios
       .put(`https://localhost:5001/api/Project/${data.ProjectId}`, {
         ...data,
-        ProjectStatus: "Pinned",
+        ProjectViewStatus: "Pinned",
       })
       .then(window.location.reload());
     console.log(res);
@@ -672,7 +672,7 @@ const ProjectTable = (props) => {
     const res = await axios
       .put(`https://localhost:5001/api/Project/${data.ProjectId}`, {
         ...data,
-        ProjectStatus: "inProgress",
+        ProjectViewStatus: "None",
       })
       .then(window.location.reload());
     console.log(res);
@@ -682,7 +682,7 @@ const ProjectTable = (props) => {
     const res = await axios
       .put(`https://localhost:5001/api/Project/${data.ProjectId}`, {
         ...data,
-        ProjectStatus: "Archived",
+        ProjectViewStatus: "Archived",
       })
       .then(window.location.reload());
     console.log(res);
@@ -725,7 +725,7 @@ const ProjectTable = (props) => {
               <button onClick={() => routeChange(data.ProjectId)}>Edit</button>
               <button
                 onClick={() => {
-                  if (data.ProjectStatus === "Pinned") {
+                  if (data.ProjectViewStatus === "Pinned") {
                     handleUnpin(data);
                   } else {
                     handlePin(data);
@@ -734,7 +734,17 @@ const ProjectTable = (props) => {
               >
                 Pin
               </button>
-              <button onClick={() => handleArchive(data)}>Archive</button>
+              <button
+                onClick={() => {
+                  if (data.ProjectViewStatus === "Archived") {
+                    handleUnpin(data);
+                  } else {
+                    handleArchive(data);
+                  }
+                }}
+              >
+                Archive
+              </button>
             </td>
           </tr>
         </tbody>
