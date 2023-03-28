@@ -472,6 +472,7 @@ export default class Project extends React.Component {
   };
   //------------------------------------------------TO BE UPDATED---------------------------------------//
 
+
   getSettings = async () => {
     // fetches http://...:5001/api/User/Settings
     return fetch(this.settings.api + "Settings", {
@@ -879,8 +880,57 @@ const DisplayTables = (props) => {
             <CreateButton />
           </Accordion.Body>
         </Accordion.Item>
+
+        <Accordion.Item eventKey="4">
+          <Accordion.Header>Logging</Accordion.Header>
+          <Accordion.Body>
+            <Logging logs = {logArr} />
+          </Accordion.Body>
+        </Accordion.Item>
+
       </Accordion>
+
+      
     </>
+  );
+};
+
+const logArr = [
+  { id: 1, project:'love in action', name:'Project budget = 10000 to 6000', action: 'Update', user: 'test', date: '30-3-2023' },
+  { id: 2, project:'Project Youth', name:'Project status = Started to In Progress', action: 'Update', user: 'test', date: '30-3-2023' },
+];
+
+const Logging = ( {logs}) => {
+
+  return (
+    <>
+    <Table striped bordered hover>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Project</th>
+      <th>Log Name</th>
+      <th>Log Action</th>
+      <th>User</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {logs.map((log, index) => (
+      <tr key={log.id}>
+        <td>{index + 1}</td>
+        <td>{log.project}</td>
+        <td>{log.name}</td>
+        <td>{log.action}</td>
+        <td>{log.user}</td>
+        <td>{log.date}</td>
+      </tr>
+    ))}
+  </tbody>
+</Table>
+
+    </>
+    
   );
 };
 
@@ -1015,6 +1065,7 @@ const ProjectTable = (props) => {
     </>
   );
 };
+
 
 const GenerateChart = (props) => {
   const projects = props.projects;
