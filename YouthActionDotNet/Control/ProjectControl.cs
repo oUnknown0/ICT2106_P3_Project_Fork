@@ -147,8 +147,17 @@ namespace YouthActionDotNet.Control
         public async Task<ActionResult<string>> All()
         {
             var projects = await ProjectRepositoryOut.GetAllAsync();
+            var list = projects.ToList();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (i + 1 < list.Count)
+                {
+                    list[i].CompareById(list[i + 1]);
+                }
+            }
             return JsonConvert.SerializeObject(new { success = true, data = projects, message = "Projects Successfully Retrieved" });
         }
+
 
         //------------------------------------------------------TO BE UPDATED---------------------------------------------------//
         public async Task<ActionResult<string>> GetProjectByTag(string tag)

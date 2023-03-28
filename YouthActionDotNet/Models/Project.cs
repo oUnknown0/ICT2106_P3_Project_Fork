@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace YouthActionDotNet.Models
 {
-    public class Project
+    public class Project : ICompare<Project>
     {
         public Project()
         {
@@ -37,5 +37,12 @@ namespace YouthActionDotNet.Models
         public virtual Timeline Timeline { get; set; }
         [JsonIgnore]
         public virtual Budget Budget { get; set; }
+
+        public int CompareById(Project y)
+        {
+            return this.ProjectId.CompareTo(y.ProjectId);
+        } 
     }
+
+
 }
