@@ -67,14 +67,20 @@ namespace YouthActionDotNet.Controllers
             return logsControl.Settings();
         }
 
+        [HttpPut("{id}")]
         public async Task<ActionResult<string>> Update(string id, Logs template)
         {
             return await logsControl.Update(id, template);
         }
 
+        [HttpPut("UPdateAndFetch/{id}")]
         public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Logs template)
         {
             return await logsControl.UpdateAndFetchAll(id, template);
+        }
+
+        public string getCurrentDate() {
+            return DateTime.Now.ToString("dd/MM/yyyy HH:mm");
         }
     }
 }

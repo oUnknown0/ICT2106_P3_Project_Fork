@@ -152,6 +152,37 @@ namespace YouthActionDotNet.Migrations
                     b.ToTable("File", (string)null);
                 });
 
+            modelBuilder.Entity("YouthActionDotNet.Models.Logs", b =>
+                {
+                    b.Property<int>("logId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("logAction")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("logDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("logDescription")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("logDoneByUser")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("logProject")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("logId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Logs", (string)null);
+                });
+
             modelBuilder.Entity("YouthActionDotNet.Models.Permissions", b =>
                 {
                     b.Property<string>("Id")
@@ -420,6 +451,15 @@ namespace YouthActionDotNet.Migrations
                     b.Navigation("project");
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("YouthActionDotNet.Models.Logs", b =>
+                {
+                    b.HasOne("YouthActionDotNet.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("YouthActionDotNet.Models.Project", b =>

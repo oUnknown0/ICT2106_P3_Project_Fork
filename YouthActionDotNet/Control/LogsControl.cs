@@ -31,9 +31,9 @@ namespace YouthActionDotNet.Control
         }
 
         public async Task<ActionResult<string>> Create(Logs template)
-        {
-            var log = await LogRepositoryIn.InsertAsync(template);
-            return JsonConvert.SerializeObject(new { sucess = true, message = "Log Created", data = log});
+        {  
+            var log = await LogRepositoryIn.MakeLog(template.logProject, template.logAction, template.logDescription, template.logDoneByUser, template.logDate);
+            return JsonConvert.SerializeObject(new { sucess = true, data = template, message = "Log Created" });
         }
 
         public async Task<ActionResult<string>> Get(string id)
@@ -48,7 +48,7 @@ namespace YouthActionDotNet.Control
 
         public async Task<ActionResult<string>> Update(string id, Logs template)
         {
-            if (id != template.logId)
+            if (id != template.logId.ToString())
             {
                 return JsonConvert.SerializeObject(new { success = false, data = "", message = "Log id not match" });
             }
@@ -72,7 +72,7 @@ namespace YouthActionDotNet.Control
 
         public async Task<ActionResult<string>> UpdateAndFetchAll(string id, Logs template)
         {
-            if (id != template.logId)
+            if (id != template.logId.ToString())
             {
                 return JsonConvert.SerializeObject(new { success = false, data = "", message = "Log Id Mismatch" });
             }
