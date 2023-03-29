@@ -911,12 +911,7 @@ const DisplayTables = (props) => {
           <Accordion.Header>Charts</Accordion.Header>
           <Accordion.Body>
             <GenerateChart projects={projects} />
-            <BudgetTable
-              projects={pinnedProjects}
-              applySorting={applySorting}
-              routeChange={routeChange}
-              sorting={sorting}
-            />
+
             <CreatePDFButton />
             <br></br>
             <CreateDocxButton />
@@ -1205,6 +1200,7 @@ const GenerateChart = (props) => {
   };
 
   const pieChartOptions = {
+    backgroundColor: "white",
     maintainAspectRatio: false,
     legend: {
       position: "bottom",
@@ -1281,40 +1277,52 @@ const GenerateChart = (props) => {
     },
   };
   return (
-    <div id="pdffile" style={{ backgroundColor: "white" }}>
-      <section className="report-dashboard">
-        <div className="row">
-          <div className="flex-container" style={{ textAlign: "center" }}>
-            <div className="report-dashboard-item">
-              <div
-                style={{
-                  width: 600,
-                  height: 600,
-                  overflow: "auto",
-                  margin: "auto",
-                  display: "inline-block",
-                }}
-              >
-                <Pie data={getChartData3(projects)} options={pieChartOptions} />
-              </div>
-              <div
-                style={{
-                  width: 600,
-                  height: 600,
-                  overflow: "auto",
-                  margin: "auto",
-                  display: "inline-block",
-                }}
-              >
-                <Bar
-                  data={getChartData4(projects, timelines)}
-                  options={barChartOptions}
-                />
+    <div>
+      <div
+        id="pdffile"
+        style={{
+          backgroundImage:
+            "url('https://www.solidbackgrounds.com/images/2560x1440/2560x1440-white-solid-color-background.jpg')",
+        }}
+      >
+        <section className="report-dashboard">
+          <div className="row">
+            <div className="flex-container" style={{ textAlign: "center" }}>
+              <div className="report-dashboard-item">
+                <div
+                  style={{
+                    width: 600,
+                    height: 600,
+                    overflow: "auto",
+                    margin: "auto",
+                    display: "inline-block",
+                  }}
+                >
+                  <Pie
+                    data={getChartData3(projects)}
+                    options={pieChartOptions}
+                  />
+                </div>
+                <div
+                  style={{
+                    width: 600,
+                    height: 600,
+                    overflow: "auto",
+                    margin: "auto",
+                    display: "inline-block",
+                  }}
+                >
+                  <Bar
+                    data={getChartData4(projects, timelines)}
+                    options={barChartOptions}
+                  />
+                </div>
+                <BudgetTable />
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 };
