@@ -73,6 +73,10 @@ export default class Project extends React.Component {
 
   async componentDidMount() {
     //-------------------------------------------TO BE UPDATED---------------------------------------//
+    // window.addEventListener("storage",function(e) {
+    //   // setSearchValue(localStorage.getItem("tag-value"))
+    //   console.log("DISPLAYTABLE"+localStorage.getItem("tag-value"))
+    // })
     await this.getAllContent().then((allContent) => {
       console.log("here");
       console.log(allContent);
@@ -654,30 +658,20 @@ export default class Project extends React.Component {
 }
 
 const DisplayTables = (props) => {
+  
   const data = props.data;
   const deleteFn = props.delete;
   const createFn = props.create;
+  const tagValue = tagValueConstant
   //-------------------------------------------------------------------//
-  const SearchBar = ({callback}) => {
-    console.log("TAGVALUECONSTANT "+tagValueConstant)
-    const [innerValue, setInnerValue] = useState("");
-    
-    const handleSubmit = e => {
-      e.preventDefault()
-      callback(innerValue)
+  
+
+  function handleKeydown(e) {
+    if (e.key === "Enter") {
+      setSearchValue(localStorage.getItem("tag-value"))
     }
-    // console.log("innervalue "+e.target.value)
-    return (
-      <form className="searchBar" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          className="searchBarInput"
-          value={innerValue}
-          onChange={(e) => setInnerValue(e.target.value)}
-        />
-      </form>
-    );
-  };
+  }
+  document.addEventListener("keydown", handleKeydown);
   //------------------------------------------------------------------//
   let navigate = useNavigate();
   const routeChange = (id) => {
@@ -696,7 +690,6 @@ const DisplayTables = (props) => {
   const [otherProjects, setOtherProjects] = useState([]);
   //------------------------------------------------------------------------------//
   const [searchValue, setSearchValue] = useState("");
-  console.log('searchValue', searchValue)
   //------------------------------------------------------------------------------//
   const [projRef, setProjRef] = useState();
   const [undo, setUndo] = useState(false);
@@ -880,7 +873,6 @@ const DisplayTables = (props) => {
 
   return (
     <>
-    <SearchBar callback={(searchValue) => setSearchValue(searchValue)} />
       <Accordion defaultActiveKey="0">
         <Accordion.Item eventKey="0">
           <Accordion.Header>Pinned Projects</Accordion.Header>
@@ -940,11 +932,14 @@ const DisplayTables = (props) => {
   );
 };
 let tagValueConstant = null
+
 export const GetTagValue = (props, callback) => {
   const tagValue = props.tagValue;
   // setSearchValue(tagValue)
   tagValueConstant = tagValue.substring(1, tagValue.length - 1);
   console.log("HAHAHHAHAHHAHHAHAHHA "+tagValueConstant)
+  localStorage.setItem('tag-value',tagValueConstant)
+
 };
 
 
@@ -990,8 +985,6 @@ const Logging = ( {logs}) => {
 
 export const ProjectTable = (props) => {
   const projects = props.projects;
-  // const tagValue = GetTagValue;
-  console.log("GETGETGET IN TABLE "+tagValueConstant)
   const applySorting = props.applySorting;
   const routeChange = props.routeChange;
   const sorting = props.sorting;

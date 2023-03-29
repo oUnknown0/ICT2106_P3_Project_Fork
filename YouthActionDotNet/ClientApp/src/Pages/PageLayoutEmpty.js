@@ -1046,6 +1046,7 @@ export class SearchBar extends React.Component {
           suggestions: searchSuggestions,
           placeholder: "",
       })
+      console.log("SELECTED TAG ", tag)
       this.searchInput.current.value = ""
       this.searchInput.current.focus();
       this.props.searchCallBack(tag);
