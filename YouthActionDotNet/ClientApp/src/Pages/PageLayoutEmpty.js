@@ -342,6 +342,12 @@ export class TableHeader extends React.Component {
 
     this.props.handleSearchCallBack(this.state.currentTags);
   }
+  handleEditClick = (tagToEdit) => {
+    // handle the edit click event
+    localStorage.setItem('tag-value',tagToEdit.value.substring(1, tagToEdit.value.length - 1))
+    console.log("handleEditClick "+localStorage.getItem("tag-value"))
+  }
+
   //----------------------------TO BE COMMENTED-----------------------//
   render() {
     return (
@@ -441,6 +447,7 @@ export class TableHeader extends React.Component {
                 type={tag.type}
                 key={index}
                 tagValue={tag.value}
+                onEditClick={() => this.handleEditClick(tag)}
               >
                 {tag.value}
                 <GetTagValue tagValue={tag.value}></GetTagValue>
@@ -1046,7 +1053,6 @@ export class SearchBar extends React.Component {
           suggestions: searchSuggestions,
           placeholder: "",
       })
-      console.log("SELECTED TAG ", tag)
       this.searchInput.current.value = ""
       this.searchInput.current.focus();
       this.props.searchCallBack(tag);
