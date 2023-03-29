@@ -912,6 +912,12 @@ const DisplayTables = (props) => {
           <Accordion.Header>Charts</Accordion.Header>
           <Accordion.Body>
             <GenerateChart projects={projects} />
+            <BudgetTable
+              projects={pinnedProjects}
+              applySorting={applySorting}
+              routeChange={routeChange}
+              sorting={sorting}
+            />
             <CreatePDFButton />
             <br></br>
             <CreateDocxButton />
@@ -1109,6 +1115,45 @@ export const ProjectTable = (props) => {
             </tbody>
           );
         })}
+      </Table>
+      <ToastContainer theme="dark" />
+    </>
+  );
+};
+export const BudgetTable = (props) => {
+  const budgetRanges = [
+    { min: 0, max: 10, label: "< $1000" },
+    { min: 10, max: 50, label: "$1000-$5000" },
+    { min: 50, max: 100, label: "$5000-$15000" },
+    { min: 100, max: Infinity, label: "> $15000" },
+  ];
+
+  const budgetData = [
+    { range: "< $1000", count: 5 },
+    { range: "$1000-$5000", count: 10 },
+    { range: "$5000-$15000", count: 3 },
+    { range: "> $15000", count: 2 },
+  ];
+
+  return (
+    <>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Budget Range</th>
+            <th>Project Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {budgetData.map((item, key) => {
+            return (
+              <tr key={key}>
+                <td>{item.range}</td>
+                <td>{item.count}</td>
+              </tr>
+            );
+          })}
+        </tbody>
       </Table>
       <ToastContainer theme="dark" />
     </>
