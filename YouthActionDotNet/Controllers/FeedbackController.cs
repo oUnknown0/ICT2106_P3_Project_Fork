@@ -73,6 +73,12 @@ namespace YouthActionDotNet.Controllers
             return await FeedbackControl.All();
         }
 
+        [HttpGet("WordCount")]
+        public async Task<ActionResult<string>> WordCount(string name)
+        {
+            return await FeedbackControl.GetWordCount(name);
+        }
+
         [HttpGet("Settings")]
         public string Settings()
         {

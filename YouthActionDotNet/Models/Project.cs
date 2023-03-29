@@ -6,7 +6,8 @@ using YouthActionDotNet.Models;
 
 namespace YouthActionDotNet.Models
 {
-    public class Project
+
+    public class Project : ICompare<Project>
     {  
         private List<IObserver> observers = new List<IObserver>();
 
@@ -90,4 +91,9 @@ public class ConcreteObserver : YouthActionDotNet.Models.IObserver
   public void Unsubscribe() {
     projects.Detach(this);
   }
+          public int CompareById(Project y)
+        {
+            return this.ProjectId.CompareTo(y.ProjectId);
+        } 
 }
+

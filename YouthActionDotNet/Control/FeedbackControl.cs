@@ -18,6 +18,7 @@ namespace YouthActionDotNet.Control
         private GenericRepositoryOut<Feedback> FeedbackRepositoryOut;
         private GenericRepositoryIn<ServiceCenter> ServiceCenterRepositoryIn;
         private GenericRepositoryOut<ServiceCenter> ServiceCenterRepositoryOut;
+        private DictionaryWordCountStrategy WordCounter = new DictionaryWordCountStrategy();
 
         JsonSerializerSettings settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
 
@@ -142,6 +143,27 @@ namespace YouthActionDotNet.Control
             return JsonConvert.SerializeObject(new { success = true, data = settings, message = "Settings Successfully Retrieved" });
         }
 
+        public async Task<List<Feedback>> GetByNameAsync(string projectName) {
+            var feedbacks = await FeedbackRepositoryOut.GetAllAsync();
+            var list = feedbacks.ToList();
+            List<Feedback> outputList = new List<Feedback>();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (i + 1 < list.Count)
+                {
+                    if (list[i].ProjectName == projectName) {
+                        outputList.Add(list[i]);
+                    }
+                } 
+            }
+            return outputList;
+        }
+
+        public async Task<ActionResult<string>> GetWordCount(string projectName) {
+            var feedbacks = await GetByNameAsync(projectName);
+            var output = WordCounter.wordCounter(feedbacks);
+            return JsonConvert.SerializeObject(new { success = true, data = output, message = "Word Counter successfully executed" });
+        }
 
     }
 }
