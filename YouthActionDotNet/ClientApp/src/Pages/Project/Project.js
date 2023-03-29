@@ -23,9 +23,13 @@ import { FaFileWord } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa";
 import { Pie, Bar, Line } from "react-chartjs-2";
+
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph } from "docx";
 import html2canvas from "html2canvas";
+
+import { Button } from 'react-bootstrap';
+
 export default class Project extends React.Component {
   // state = {
   //   content: null,
@@ -360,6 +364,47 @@ export default class Project extends React.Component {
         archived: archived,
         loading: false,
       });
+    });
+  };
+
+  createLog = async (data) => {
+    return fetch("https://localhost:5001/api/Logs/Create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then(function (res) {
+      return res.json();
+    });
+  };
+  
+  updateLog = async (data) => {
+    console.log(data);
+    return fetch(`${this.settings.api}UpdateAndFetch/${data.logId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then(async (res) => {
+      return res.json();
+    });
+  };
+  
+  handleLogUpdate = async (data) => {
+    await this.updateLog(data).then((content) => {
+      if (content.success) {
+        this.setState({
+          error: "",
+        });
+        return true;
+      } else {
+        this.setState({
+          error: content.message,
+        });
+        return false;
+      }
     });
   };
   //------------------------------------------------TO BE UPDATED---------------------------------------//
@@ -785,8 +830,6 @@ const DisplayTables = (props) => {
         })
         .slice();
     }
-    // const { tagValue } = this.props;
-    // Replace currentprojects with sorted currentprojects
     const projectsPinned = sortedProjects.filter((project) => {
       return project.ProjectViewStatus == "Pinned";
     });
@@ -923,7 +966,7 @@ const DisplayTables = (props) => {
         <Accordion.Item eventKey="4">
           <Accordion.Header>Logging</Accordion.Header>
           <Accordion.Body>
-            <Logging logs={logArr} />
+            <Logging />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
@@ -940,48 +983,73 @@ export const GetTagValue = (props, callback) => {
   localStorage.setItem("tag-value", tagValueConstant);
 };
 
-const logArr = [
+const logsArr = [
   {
     id: 1,
-    project: "love in action",
-    name: "Project budget = 10000 to 6000",
-    action: "Update",
-    user: "test",
-    date: "30-3-2023",
+    logProject: "love in action",
+    logDescription: "Project budget = 10000 to 6000",
+    logAction: "Update",
+    logDoneByUser: "test",
+    logDate: "30/03/2023 02:18",
   },
   {
     id: 2,
-    project: "Project Youth",
-    name: "Project status = Started to In Progress",
-    action: "Update",
-    user: "test",
-    date: "30-3-2023",
+    logProject: "Project Youth",
+    logDescription: "Project Description = Help young teenager in need",
+    logAction: "Update",
+    logDoneByUser: "test",
+    logDate: "30/03/2023 01:10",
   },
 ];
 
-const Logging = ({ logs }) => {
+const Logging = () => {
+  const [logs, setLogs] = useState(logsArr);
+
+  useEffect(() => {
+    const storedLogs = JSON.parse(localStorage.getItem("logs"));
+    if (storedLogs) {
+      setLogs(storedLogs);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("logs", JSON.stringify(logs));
+  }, [logs]);
+
+  const handleDeleteLog = (id) => {
+    setLogs(logs.filter((log) => log.id !== id));
+  };
+
   return (
     <>
       <Table striped bordered hover>
         <thead>
           <tr>
             <th>#</th>
-            <th>Project</th>
-            <th>Log Name</th>
+            <th>Log Project</th>
+            <th>Log User</th>
             <th>Log Action</th>
-            <th>User</th>
-            <th>Date</th>
+            <th>Log Description</th>
+            <th>Log Date</th>
+            <th>Delete</th>
           </tr>
         </thead>
         <tbody>
           {logs.map((log, index) => (
             <tr key={log.id}>
               <td>{index + 1}</td>
-              <td>{log.project}</td>
-              <td>{log.name}</td>
-              <td>{log.action}</td>
-              <td>{log.user}</td>
-              <td>{log.date}</td>
+              <td>{log.logProject}</td>
+              <td>{log.logDoneByUser}</td>
+              <td>{log.logAction}</td>
+              <td>{log.logDescription}</td>
+              <td>{log.logDate}</td>
+              <td>
+                <button
+                  onClick={() => handleDeleteLog(log.id)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -997,6 +1065,7 @@ export const ProjectTable = (props) => {
   const sorting = props.sorting;
   const [timelines, setTimeline] = useState([]);
   const [budgets, setBudget] = useState([]);
+  const logs = props.logs;
   useEffect(() => {
     const getTimelineData = async () => {
       const res = await axios.get(`https://localhost:5001/api/Timeline/All`);
@@ -1115,7 +1184,7 @@ export const ProjectTable = (props) => {
               </tr>
             </tbody>
           );
-        })}
+        })},
       </Table>
       <ToastContainer theme="dark" />
     </>
