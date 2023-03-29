@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Loading } from "../../Components/appCommon";
 import DatapageLayout from "../PageLayoutEmpty";
+import handleSearchCallBack from "../PageLayoutEmpty";
 import Table from "react-bootstrap/Table";
 import { useParams } from "react-router-dom";
 import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
@@ -22,6 +23,8 @@ import { FaFileWord } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa";
 import { Pie, Bar, Line } from "react-chartjs-2";
+import { saveAs } from 'file-saver';
+import { Document, Packer, Paragraph } from 'docx';
 export default class Project extends React.Component {
   // state = {
   //   content: null,
@@ -654,6 +657,28 @@ const DisplayTables = (props) => {
   const data = props.data;
   const deleteFn = props.delete;
   const createFn = props.create;
+  //-------------------------------------------------------------------//
+  const SearchBar = ({callback}) => {
+    console.log("TAGVALUECONSTANT "+tagValueConstant)
+    const [innerValue, setInnerValue] = useState("");
+    
+    const handleSubmit = e => {
+      e.preventDefault()
+      callback(innerValue)
+    }
+    // console.log("innervalue "+e.target.value)
+    return (
+      <form className="searchBar" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          className="searchBarInput"
+          value={innerValue}
+          onChange={(e) => setInnerValue(e.target.value)}
+        />
+      </form>
+    );
+  };
+  //------------------------------------------------------------------//
   let navigate = useNavigate();
   const routeChange = (id) => {
     let path = `/Project/View/${id}`;
@@ -669,6 +694,10 @@ const DisplayTables = (props) => {
   const [archiveProjects, setArchiveProjects] = useState([]);
   const [pinnedProjects, setPinnedProjects] = useState([]);
   const [otherProjects, setOtherProjects] = useState([]);
+  //------------------------------------------------------------------------------//
+  const [searchValue, setSearchValue] = useState("");
+  console.log('searchValue', searchValue)
+  //------------------------------------------------------------------------------//
   const [projRef, setProjRef] = useState();
   const [undo, setUndo] = useState(false);
   const [sorting, setSorting] = useState({
@@ -694,6 +723,20 @@ const DisplayTables = (props) => {
     className: "black-background",
     position: toast.POSITION.BOTTOM_CENTER,
   };
+  //------------------------------------------------------------------------------//
+  const filterArticles = (searchValue) => {
+    if (searchValue === "") {
+      return projects;
+    }
+    return projects.filter((project) =>
+      project.ProjectName.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  };
+  useEffect(() => {
+    const filteredArticles = filterArticles(searchValue);
+    setOtherProjects(filteredArticles);
+  }, [searchValue]);
+//------------------------------------------------------------------------------//
 
   //When delete is clicked, all details of the project will be copied and stored in temporary variable.
   useEffect(() => {
@@ -751,15 +794,8 @@ const DisplayTables = (props) => {
         })
         .slice();
     }
+    // const { tagValue } = this.props;
     // Replace currentprojects with sorted currentprojects
-
-    // const projectsPinned = sortedProjects.filter((project) => {
-    //   return project.ProjectStatus == "Pinned";
-    // });
-
-    // const projectsArchived = sortedProjects.filter((project) => {
-    //   return project.ProjectStatus == "Archived";
-    // });
     const projectsPinned = sortedProjects.filter((project) => {
       return project.ProjectViewStatus == "Pinned";
     });
@@ -772,9 +808,15 @@ const DisplayTables = (props) => {
       return project.ProjectViewStatus == "None" || project.ProjectViewStatus == null;
     });
     // const projectsOther = sortedProjects.filter((project) => {
-    //   return (
-    //     !projectsArchived.includes(project) && !projectsPinned.includes(project)
-    //   );
+    //   return (project.ProjectViewStatus == "None" || project.ProjectViewStatus == null)&&project.ProjectName == tagValueConstant;
+    // });
+    // const projectsOther = sortedProjects.filter((project) => {
+    //   console.log("refreshTable"+tagValueConstant)
+    //   return project.ProjectName == tagValueConstant;
+    // });
+
+    // const searchProjects = sortedProjects.filter((project) => {
+    //   return project.ProjectName == tagValue;
     // });
 
     setArchiveProjects(
@@ -838,6 +880,7 @@ const DisplayTables = (props) => {
 
   return (
     <>
+    <SearchBar callback={(searchValue) => setSearchValue(searchValue)} />
       <Accordion defaultActiveKey="0">
         <Accordion.Item eventKey="0">
           <Accordion.Header>Pinned Projects</Accordion.Header>
@@ -877,7 +920,9 @@ const DisplayTables = (props) => {
           <Accordion.Header>Charts</Accordion.Header>
           <Accordion.Body>
             <GenerateChart projects={projects} />
-            <CreateButton />
+            <CreatePDFButton />
+            <br></br>
+            <CreateDocxButton />
           </Accordion.Body>
         </Accordion.Item>
 
@@ -894,6 +939,14 @@ const DisplayTables = (props) => {
     </>
   );
 };
+let tagValueConstant = null
+export const GetTagValue = (props, callback) => {
+  const tagValue = props.tagValue;
+  // setSearchValue(tagValue)
+  tagValueConstant = tagValue.substring(1, tagValue.length - 1);
+  console.log("HAHAHHAHAHHAHHAHAHHA "+tagValueConstant)
+};
+
 
 const logArr = [
   { id: 1, project:'love in action', name:'Project budget = 10000 to 6000', action: 'Update', user: 'test', date: '30-3-2023' },
@@ -934,8 +987,11 @@ const Logging = ( {logs}) => {
   );
 };
 
-const ProjectTable = (props) => {
+
+export const ProjectTable = (props) => {
   const projects = props.projects;
+  // const tagValue = GetTagValue;
+  console.log("GETGETGET IN TABLE "+tagValueConstant)
   const applySorting = props.applySorting;
   const routeChange = props.routeChange;
   const sorting = props.sorting;
@@ -1177,9 +1233,49 @@ const GenerateChart = (props) => {
   );
 };
 
-export const CreateButton = (props) => {
+export const CreateDocxButton = (props) => {
+  const generateDocx = (element, filename = '') => {
+    var preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+    var postHtml = "</body></html>";
+    var html = preHtml+document.getElementById(element).innerHTML+postHtml;
+
+    var blob = new Blob(['\ufeff', html], {
+        type: 'application/msword'
+    });
+    
+    // Specify link url
+    var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    
+    // Specify file name
+    filename = filename?filename+'.doc':'document.doc';
+    
+    // Create download link element
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+    
+    if(navigator.msSaveOrOpenBlob ){
+        navigator.msSaveOrOpenBlob(blob, filename);
+    }else{
+        // Create a link to the file
+        downloadLink.href = url;
+        
+        // Setting the file name
+        downloadLink.download = filename;
+        
+        //triggering the function
+        downloadLink.click();
+    }
+    
+    document.body.removeChild(downloadLink);
+  };
+
+  return <StdButton onClick={() => generateDocx('pdffile', 'word.docx')}>Generate DOCX</StdButton>;
+};  
+
+export const CreatePDFButton = (props) => {
   const exportPDF = () => {
-    const report = new JsPDF("portrait", "pt", "a4");
+    const report = new JsPDF("p", "pt", [1850, 1900]);
     report.html(document.getElementById("pdffile")).then(() => {
       report.save("Default.pdf");
     });

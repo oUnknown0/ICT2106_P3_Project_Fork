@@ -13,7 +13,8 @@ import { Chart } from "chart.js";
 import * as d3 from "d3";
 import cloud from "d3-cloud";
 import { Pie, Bar, Line } from "react-chartjs-2";
-import { CreateButton } from "./Project";
+import { CreatePDFButton } from "./Project";
+import { CreateDocxButton } from "./Project";
 
 //feedback charts for satisfaction and recommend
 const FeedbackCharts = ({ satisfactionData, recommendData }) => {
@@ -121,7 +122,7 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ flex: 1, marginLeft: "50px", marginRight: "50px" }}>
+      <div style={{ flex: 1, marginLeft: "50px", marginRight: "50px", overflow: "auto"}}>
         <h3>Satisfaction Data</h3>
         <canvas ref={satisfactionChartRef} />
       </div>
@@ -593,25 +594,28 @@ export default class View extends React.Component {
                 feedbackTextData={feedbackTextDataForProject}
               />
             </div>
+            <div>
+              <VolunteerTable
+                deleteVolunteer={this.deleteVolunteer}
+                data={data[0]}
+              />
+              <h1 style={{ marginTop: "100px", marginBottom: "20px" }}>
+                Add Volunteers to this Project
+              </h1>
+              {console.log(this.state.volunteer)}
+              <TableButton
+                volunteerData={this.state.volunteer}
+                setVolunteerList={this.setVolunteerList}
+                deleteVolunteer={this.deleteVolunteer}
+                data={data[0]}
+                volunteerList={this.state.selectedVolunteer}
+              />
+            </div>
+            <CreatePDFButton />
+            <br></br>
+            <CreateDocxButton />
           </div>
-          <CreateButton />
-          <div>
-            <VolunteerTable
-              deleteVolunteer={this.deleteVolunteer}
-              data={data[0]}
-            />
-            <h1 style={{ marginTop: "100px", marginBottom: "20px" }}>
-              Add Volunteers to this Project
-            </h1>
-            {console.log(this.state.volunteer)}
-            <TableButton
-              volunteerData={this.state.volunteer}
-              setVolunteerList={this.setVolunteerList}
-              deleteVolunteer={this.deleteVolunteer}
-              data={data[0]}
-              volunteerList={this.state.selectedVolunteer}
-            />
-          </div>
+          <br></br>
           <Button onClick={() => this.setVolunteer()}>Submit</Button>
         </DatapageLayout>
       );
@@ -749,6 +753,7 @@ const ProjectTable = (props) => {
           </tr>
         </tbody>
       </Table>
+      <h1>Project Analysis</h1>
       <GenerateChart data={data} timeline={timeline} budget={budget} />
     </>
   );
@@ -1013,10 +1018,10 @@ function GenerateChart(props) {
     <div
       style={{
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "space-evenly",
       }}
     >
-      <div style={{ width: 600, height: 300, overflow: "auto" }}>
+      <div style={{ width: 800, height: 400, overflow: "auto" }}>
         {console.log(item, budget, timeline)}
         <Bar
           data={getChartData1(
@@ -1026,7 +1031,7 @@ function GenerateChart(props) {
           )}
         />
       </div>
-      <div style={{ width: 600, height: 300, overflow: "auto" }}>
+      <div style={{ width: 800, height: 400, overflow: "auto" }}>
         <Line
           data={getChartData2(
             timeline?.ProjectStartDate,
