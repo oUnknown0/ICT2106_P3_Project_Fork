@@ -25,6 +25,7 @@ import { FaFilePdf } from "react-icons/fa";
 import { Pie, Bar, Line } from "react-chartjs-2";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph } from "docx";
+import html2canvas from "html2canvas";
 export default class Project extends React.Component {
   // state = {
   //   content: null,
@@ -1137,25 +1138,27 @@ export const BudgetTable = (props) => {
 
   return (
     <>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Budget Range</th>
-            <th>Project Count</th>
-          </tr>
-        </thead>
-        <tbody>
-          {budgetData.map((item, key) => {
-            return (
-              <tr key={key}>
-                <td>{item.range}</td>
-                <td>{item.count}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-      <ToastContainer theme="dark" />
+      <div id="budgettable">
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Budget Range</th>
+              <th>Project Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {budgetData.map((item, key) => {
+              return (
+                <tr key={key}>
+                  <td>{item.range}</td>
+                  <td>{item.count}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        <ToastContainer theme="dark" />
+      </div>
     </>
   );
 };
@@ -1196,6 +1199,21 @@ const GenerateChart = (props) => {
           backgroundColor: ["#FF1818", "#5463FF"],
         },
       ],
+      plugins: [
+        {
+          id: "whiteBackground",
+          beforeDraw: (chartInstance) => {
+            const ctx = chartInstance.canvas.getContext("2d");
+            ctx.fillStyle = "white";
+            ctx.fillRect(
+              0,
+              0,
+              chartInstance.canvas.width,
+              chartInstance.canvas.height
+            );
+          },
+        },
+      ],
     };
   };
 
@@ -1219,10 +1237,10 @@ const GenerateChart = (props) => {
     },
     scales: {
       x: {
-        backgroundColor: "white",
+        backgroundColor: "transparent",
       },
       y: {
-        backgroundColor: "white",
+        backgroundColor: "transparent",
       },
     },
   };
@@ -1252,6 +1270,21 @@ const GenerateChart = (props) => {
           backgroundColor: ["#5463FF"],
         },
       ],
+      plugins: [
+        {
+          id: "whiteBackground",
+          beforeDraw: (chartInstance) => {
+            const ctx = chartInstance.canvas.getContext("2d");
+            ctx.fillStyle = "white";
+            ctx.fillRect(
+              0,
+              0,
+              chartInstance.canvas.width,
+              chartInstance.canvas.height
+            );
+          },
+        },
+      ],
     };
   };
 
@@ -1263,7 +1296,7 @@ const GenerateChart = (props) => {
           ticks: {
             beginAtZero: true,
           },
-          backgroundColor: "white",
+          backgroundColor: "transparent",
         },
       ],
       xAxes: [
@@ -1271,7 +1304,7 @@ const GenerateChart = (props) => {
           ticks: {
             beginAtZero: true,
           },
-          backgroundColor: "white",
+          backgroundColor: "transparent",
         },
       ],
     },
@@ -1280,10 +1313,13 @@ const GenerateChart = (props) => {
     <div>
       <div
         id="pdffile"
-        style={{
-          backgroundImage:
-            "url('https://www.solidbackgrounds.com/images/2560x1440/2560x1440-white-solid-color-background.jpg')",
-        }}
+        style={
+          {
+            // backgroundImage:
+            //   "url('https://www.solidbackgrounds.com/images/2560x1440/2560x1440-white-solid-color-background.jpg')",
+            // backgroundColor: "white",
+          }
+        }
       >
         <section className="report-dashboard">
           <div className="row">
@@ -1375,13 +1411,29 @@ export const CreateDocxButton = (props) => {
 
 export const CreatePDFButton = (props) => {
   const exportPDF = () => {
-    const report = new JsPDF("p", "pt", [1850, 1900]);
-    report.html(document.getElementById("pdffile")).then(() => {
-      report.save("Default.pdf");
+    const canvas = document.getElementsByTagName("canvas");
+
+    const budgettable = document.getElementById("budgettable");
+
+    // Use html2canvas to generate a canvas element from the table
+    html2canvas(budgettable).then((tableCanvas) => {
+      const tableImgData = tableCanvas.toDataURL("image/png", 1.0);
+
+      const imgData = canvas[0].toDataURL("image/png", 1.0);
+      const imgData2 = canvas[1].toDataURL("image/png", 1.0);
+
+      let pdf = new JsPDF("p", "pt", "a4");
+      pdf.addImage(imgData, "PNG", 20, 30, 250, 250);
+      pdf.addImage(imgData2, "PNG", 320, 30, 250, 250);
+      pdf.addImage(tableImgData, "PNG", 0, 350, 600, 150);
+
+      pdf.save("Default.pdf");
     });
   };
+
   return <StdButton onClick={() => exportPDF()}>Generate PDF</StdButton>;
 };
+
 class ViewManagement extends React.Component {
   state = {
     drawerOpen: false,
