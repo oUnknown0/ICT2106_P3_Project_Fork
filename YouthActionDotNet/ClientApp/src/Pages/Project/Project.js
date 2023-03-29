@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Loading } from "../../Components/appCommon";
 import DatapageLayout from "../PageLayoutEmpty";
+import handleSearchCallBack from "../PageLayoutEmpty";
 import Table from "react-bootstrap/Table";
 import { useParams } from "react-router-dom";
 import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
@@ -22,6 +23,8 @@ import { FaFileWord } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa";
 import { Pie, Bar, Line } from "react-chartjs-2";
+import { saveAs } from "file-saver";
+import { Document, Packer, Paragraph } from "docx";
 export default class Project extends React.Component {
   // state = {
   //   content: null,
@@ -70,6 +73,10 @@ export default class Project extends React.Component {
 
   async componentDidMount() {
     //-------------------------------------------TO BE UPDATED---------------------------------------//
+    // window.addEventListener("storage",function(e) {
+    //   // setSearchValue(localStorage.getItem("tag-value"))
+    //   console.log("DISPLAYTABLE"+localStorage.getItem("tag-value"))
+    // })
     await this.getAllContent().then((allContent) => {
       console.log("here");
       console.log(allContent);
@@ -653,6 +660,16 @@ const DisplayTables = (props) => {
   const data = props.data;
   const deleteFn = props.delete;
   const createFn = props.create;
+  const tagValue = tagValueConstant;
+  //-------------------------------------------------------------------//
+
+  function handleKeydown(e) {
+    if (e.key === "Enter") {
+      setSearchValue(localStorage.getItem("tag-value"));
+    }
+  }
+  document.addEventListener("keydown", handleKeydown);
+  //------------------------------------------------------------------//
   let navigate = useNavigate();
   const routeChange = (id) => {
     let path = `/Project/View/${id}`;
@@ -668,6 +685,9 @@ const DisplayTables = (props) => {
   const [archiveProjects, setArchiveProjects] = useState([]);
   const [pinnedProjects, setPinnedProjects] = useState([]);
   const [otherProjects, setOtherProjects] = useState([]);
+  //------------------------------------------------------------------------------//
+  const [searchValue, setSearchValue] = useState("");
+  //------------------------------------------------------------------------------//
   const [projRef, setProjRef] = useState();
   const [undo, setUndo] = useState(false);
   const [sorting, setSorting] = useState({
@@ -693,6 +713,20 @@ const DisplayTables = (props) => {
     className: "black-background",
     position: toast.POSITION.BOTTOM_CENTER,
   };
+  //------------------------------------------------------------------------------//
+  const filterArticles = (searchValue) => {
+    if (searchValue === "") {
+      return projects;
+    }
+    return projects.filter((project) =>
+      project.ProjectName.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  };
+  useEffect(() => {
+    const filteredArticles = filterArticles(searchValue);
+    setOtherProjects(filteredArticles);
+  }, [searchValue]);
+  //------------------------------------------------------------------------------//
 
   //When delete is clicked, all details of the project will be copied and stored in temporary variable.
   useEffect(() => {
@@ -750,21 +784,32 @@ const DisplayTables = (props) => {
         })
         .slice();
     }
+    // const { tagValue } = this.props;
     // Replace currentprojects with sorted currentprojects
-
     const projectsPinned = sortedProjects.filter((project) => {
-      return project.ProjectStatus == "Pinned";
+      return project.ProjectViewStatus == "Pinned";
     });
 
     const projectsArchived = sortedProjects.filter((project) => {
-      return project.ProjectStatus == "Archived";
+      return project.ProjectViewStatus == "Archived";
     });
 
     const projectsOther = sortedProjects.filter((project) => {
       return (
-        !projectsArchived.includes(project) && !projectsPinned.includes(project)
+        project.ProjectViewStatus == "None" || project.ProjectViewStatus == null
       );
     });
+    // const projectsOther = sortedProjects.filter((project) => {
+    //   return (project.ProjectViewStatus == "None" || project.ProjectViewStatus == null)&&project.ProjectName == tagValueConstant;
+    // });
+    // const projectsOther = sortedProjects.filter((project) => {
+    //   console.log("refreshTable"+tagValueConstant)
+    //   return project.ProjectName == tagValueConstant;
+    // });
+
+    // const searchProjects = sortedProjects.filter((project) => {
+    //   return project.ProjectName == tagValue;
+    // });
 
     setArchiveProjects(
       sorting.ascending ? projectsArchived : projectsArchived.reverse()
@@ -866,15 +911,84 @@ const DisplayTables = (props) => {
           <Accordion.Header>Charts</Accordion.Header>
           <Accordion.Body>
             <GenerateChart projects={projects} />
-            <CreateButton />
+
+            <CreatePDFButton />
+            <br></br>
+            <CreateDocxButton />
+          </Accordion.Body>
+        </Accordion.Item>
+
+        <Accordion.Item eventKey="4">
+          <Accordion.Header>Logging</Accordion.Header>
+          <Accordion.Body>
+            <Logging logs={logArr} />
           </Accordion.Body>
         </Accordion.Item>
       </Accordion>
     </>
   );
 };
+let tagValueConstant = null;
 
-const ProjectTable = (props) => {
+export const GetTagValue = (props, callback) => {
+  const tagValue = props.tagValue;
+  // setSearchValue(tagValue)
+  tagValueConstant = tagValue.substring(1, tagValue.length - 1);
+  console.log("HAHAHHAHAHHAHHAHAHHA " + tagValueConstant);
+  localStorage.setItem("tag-value", tagValueConstant);
+};
+
+const logArr = [
+  {
+    id: 1,
+    project: "love in action",
+    name: "Project budget = 10000 to 6000",
+    action: "Update",
+    user: "test",
+    date: "30-3-2023",
+  },
+  {
+    id: 2,
+    project: "Project Youth",
+    name: "Project status = Started to In Progress",
+    action: "Update",
+    user: "test",
+    date: "30-3-2023",
+  },
+];
+
+const Logging = ({ logs }) => {
+  return (
+    <>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Project</th>
+            <th>Log Name</th>
+            <th>Log Action</th>
+            <th>User</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {logs.map((log, index) => (
+            <tr key={log.id}>
+              <td>{index + 1}</td>
+              <td>{log.project}</td>
+              <td>{log.name}</td>
+              <td>{log.action}</td>
+              <td>{log.user}</td>
+              <td>{log.date}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </>
+  );
+};
+
+export const ProjectTable = (props) => {
   const projects = props.projects;
   const applySorting = props.applySorting;
   const routeChange = props.routeChange;
@@ -1006,6 +1120,46 @@ const ProjectTable = (props) => {
   );
 };
 
+export const BudgetTable = (props) => {
+  const budgetRanges = [
+    { min: 0, max: 10, label: "< $1000" },
+    { min: 10, max: 50, label: "$1000-$5000" },
+    { min: 50, max: 100, label: "$5000-$10000" },
+    { min: 100, max: Infinity, label: "> $10000" },
+  ];
+
+  const budgetData = [
+    { range: "< $1000", count: 1 },
+    { range: "$1000-$5000", count: 2 },
+    { range: "$5000-$10000", count: 3 },
+    { range: "> $10000", count: 2 },
+  ];
+
+  return (
+    <>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>Budget Range</th>
+            <th>Project Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {budgetData.map((item, key) => {
+            return (
+              <tr key={key}>
+                <td>{item.range}</td>
+                <td>{item.count}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </Table>
+      <ToastContainer theme="dark" />
+    </>
+  );
+};
+
 const GenerateChart = (props) => {
   const projects = props.projects;
   const [timelines, setTimeline] = useState([]);
@@ -1024,12 +1178,13 @@ const GenerateChart = (props) => {
     getBudgetData();
     getTimelineData();
   }, []);
+
   const getChartData3 = (projects) => {
     const inProgress = projects.filter((project) => {
-      return project.ProjectStatus !== "Archived";
+      return project.ProjectStatus === "In progress";
     }).length;
     const completed = projects.filter((project) => {
-      return project.ProjectStatus === "Archived";
+      return project.ProjectStatus === "Completed";
     }).length;
     console.log(completed);
     return {
@@ -1043,10 +1198,39 @@ const GenerateChart = (props) => {
       ],
     };
   };
+
+  const pieChartOptions = {
+    backgroundColor: "white",
+    maintainAspectRatio: false,
+    legend: {
+      position: "bottom",
+    },
+    plugins: {
+      datalabels: {
+        display: true,
+        color: "white",
+        font: {
+          weight: "bold",
+        },
+        formatter: (value, context) => {
+          return context.chart.data.labels[context.dataIndex];
+        },
+      },
+    },
+    scales: {
+      x: {
+        backgroundColor: "white",
+      },
+      y: {
+        backgroundColor: "white",
+      },
+    },
+  };
+
   const getChartData4 = (projects, timelines) => {
     const now = new Date();
     const inProgress = projects.filter((project) => {
-      return project.ProjectStatus !== "Archived";
+      return project.ProjectStatus === "In progress";
     });
     const data = inProgress.map((project) => {
       const timeline = timelines.find(
@@ -1070,55 +1254,128 @@ const GenerateChart = (props) => {
       ],
     };
   };
+
+  const barChartOptions = {
+    maintainAspectRatio: false,
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+          },
+          backgroundColor: "white",
+        },
+      ],
+      xAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+          },
+          backgroundColor: "white",
+        },
+      ],
+    },
+  };
   return (
-    <div id="pdffile">
-      <section class="report-dashboard">
-        <div class="row">
-          <div class="flex-container">
-            <div class="report-dashboard-item">
-              {/* {console.log(projects.ProjectId)} */}
-              <div
-                style={{
-                  width: 600,
-                  height: 600,
-                  overflow: "auto",
-                  margin: "auto",
-                }}
-              >
-                <Pie data={getChartData3(projects)} />
+    <div>
+      <div
+        id="pdffile"
+        style={{
+          backgroundImage:
+            "url('https://www.solidbackgrounds.com/images/2560x1440/2560x1440-white-solid-color-background.jpg')",
+        }}
+      >
+        <section className="report-dashboard">
+          <div className="row">
+            <div className="flex-container" style={{ textAlign: "center" }}>
+              <div className="report-dashboard-item">
+                <div
+                  style={{
+                    width: 600,
+                    height: 600,
+                    overflow: "auto",
+                    margin: "auto",
+                    display: "inline-block",
+                  }}
+                >
+                  <Pie
+                    data={getChartData3(projects)}
+                    options={pieChartOptions}
+                  />
+                </div>
+                <div
+                  style={{
+                    width: 600,
+                    height: 600,
+                    overflow: "auto",
+                    margin: "auto",
+                    display: "inline-block",
+                  }}
+                >
+                  <Bar
+                    data={getChartData4(projects, timelines)}
+                    options={barChartOptions}
+                  />
+                </div>
+                <BudgetTable />
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      <section class="report-dashboard">
-        <div class="row">
-          <div class="flex-container">
-            <div class="report-dashboard-item">
-              <div
-                style={{
-                  width: 600,
-                  height: 600,
-                  overflow: "auto",
-                  margin: "auto",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Bar data={getChartData4(projects, timelines)} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 };
 
-export const CreateButton = (props) => {
+export const CreateDocxButton = (props) => {
+  const generateDocx = (element, filename = "") => {
+    var preHtml =
+      "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+    var postHtml = "</body></html>";
+    var html = preHtml + document.getElementById(element).innerHTML + postHtml;
+
+    var blob = new Blob(["\ufeff", html], {
+      type: "application/msword",
+    });
+
+    // Specify link url
+    var url =
+      "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+
+    // Specify file name
+    filename = filename ? filename + ".doc" : "document.doc";
+
+    // Create download link element
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      // Create a link to the file
+      downloadLink.href = url;
+
+      // Setting the file name
+      downloadLink.download = filename;
+
+      //triggering the function
+      downloadLink.click();
+    }
+
+    document.body.removeChild(downloadLink);
+  };
+
+  return (
+    <StdButton onClick={() => generateDocx("pdffile", "word.docx")}>
+      Generate DOCX
+    </StdButton>
+  );
+};
+
+export const CreatePDFButton = (props) => {
   const exportPDF = () => {
-    const report = new JsPDF("portrait", "pt", "a4");
+    const report = new JsPDF("p", "pt", [1850, 1900]);
     report.html(document.getElementById("pdffile")).then(() => {
       report.save("Default.pdf");
     });
