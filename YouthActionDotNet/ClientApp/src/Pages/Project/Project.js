@@ -23,8 +23,8 @@ import { FaFileWord } from "react-icons/fa";
 import { FaFileCsv } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa";
 import { Pie, Bar, Line } from "react-chartjs-2";
-import { saveAs } from 'file-saver';
-import { Document, Packer, Paragraph } from 'docx';
+import { saveAs } from "file-saver";
+import { Document, Packer, Paragraph } from "docx";
 export default class Project extends React.Component {
   // state = {
   //   content: null,
@@ -479,7 +479,6 @@ export default class Project extends React.Component {
   };
   //------------------------------------------------TO BE UPDATED---------------------------------------//
 
-
   getSettings = async () => {
     // fetches http://...:5001/api/User/Settings
     return fetch(this.settings.api + "Settings", {
@@ -658,17 +657,15 @@ export default class Project extends React.Component {
 }
 
 const DisplayTables = (props) => {
-  
   const data = props.data;
   const deleteFn = props.delete;
   const createFn = props.create;
-  const tagValue = tagValueConstant
+  const tagValue = tagValueConstant;
   //-------------------------------------------------------------------//
-  
 
   function handleKeydown(e) {
     if (e.key === "Enter") {
-      setSearchValue(localStorage.getItem("tag-value"))
+      setSearchValue(localStorage.getItem("tag-value"));
     }
   }
   document.addEventListener("keydown", handleKeydown);
@@ -729,7 +726,7 @@ const DisplayTables = (props) => {
     const filteredArticles = filterArticles(searchValue);
     setOtherProjects(filteredArticles);
   }, [searchValue]);
-//------------------------------------------------------------------------------//
+  //------------------------------------------------------------------------------//
 
   //When delete is clicked, all details of the project will be copied and stored in temporary variable.
   useEffect(() => {
@@ -798,7 +795,9 @@ const DisplayTables = (props) => {
     });
 
     const projectsOther = sortedProjects.filter((project) => {
-      return project.ProjectViewStatus == "None" || project.ProjectViewStatus == null;
+      return (
+        project.ProjectViewStatus == "None" || project.ProjectViewStatus == null
+      );
     });
     // const projectsOther = sortedProjects.filter((project) => {
     //   return (project.ProjectViewStatus == "None" || project.ProjectViewStatus == null)&&project.ProjectName == tagValueConstant;
@@ -927,67 +926,72 @@ const DisplayTables = (props) => {
         <Accordion.Item eventKey="4">
           <Accordion.Header>Logging</Accordion.Header>
           <Accordion.Body>
-            <Logging logs = {logArr} />
+            <Logging logs={logArr} />
           </Accordion.Body>
         </Accordion.Item>
-
       </Accordion>
-
-      
     </>
   );
 };
-let tagValueConstant = null
+let tagValueConstant = null;
 
 export const GetTagValue = (props, callback) => {
   const tagValue = props.tagValue;
   // setSearchValue(tagValue)
   tagValueConstant = tagValue.substring(1, tagValue.length - 1);
-  console.log("HAHAHHAHAHHAHHAHAHHA "+tagValueConstant)
-  localStorage.setItem('tag-value',tagValueConstant)
-
+  console.log("HAHAHHAHAHHAHHAHAHHA " + tagValueConstant);
+  localStorage.setItem("tag-value", tagValueConstant);
 };
-
 
 const logArr = [
-  { id: 1, project:'love in action', name:'Project budget = 10000 to 6000', action: 'Update', user: 'test', date: '30-3-2023' },
-  { id: 2, project:'Project Youth', name:'Project status = Started to In Progress', action: 'Update', user: 'test', date: '30-3-2023' },
+  {
+    id: 1,
+    project: "love in action",
+    name: "Project budget = 10000 to 6000",
+    action: "Update",
+    user: "test",
+    date: "30-3-2023",
+  },
+  {
+    id: 2,
+    project: "Project Youth",
+    name: "Project status = Started to In Progress",
+    action: "Update",
+    user: "test",
+    date: "30-3-2023",
+  },
 ];
 
-const Logging = ( {logs}) => {
-
+const Logging = ({ logs }) => {
   return (
     <>
-    <Table striped bordered hover>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Project</th>
-      <th>Log Name</th>
-      <th>Log Action</th>
-      <th>User</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-  <tbody>
-    {logs.map((log, index) => (
-      <tr key={log.id}>
-        <td>{index + 1}</td>
-        <td>{log.project}</td>
-        <td>{log.name}</td>
-        <td>{log.action}</td>
-        <td>{log.user}</td>
-        <td>{log.date}</td>
-      </tr>
-    ))}
-  </tbody>
-</Table>
-
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Project</th>
+            <th>Log Name</th>
+            <th>Log Action</th>
+            <th>User</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {logs.map((log, index) => (
+            <tr key={log.id}>
+              <td>{index + 1}</td>
+              <td>{log.project}</td>
+              <td>{log.name}</td>
+              <td>{log.action}</td>
+              <td>{log.user}</td>
+              <td>{log.date}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </>
-    
   );
 };
-
 
 export const ProjectTable = (props) => {
   const projects = props.projects;
@@ -1120,19 +1124,20 @@ export const ProjectTable = (props) => {
     </>
   );
 };
+
 export const BudgetTable = (props) => {
   const budgetRanges = [
     { min: 0, max: 10, label: "< $1000" },
     { min: 10, max: 50, label: "$1000-$5000" },
-    { min: 50, max: 100, label: "$5000-$15000" },
-    { min: 100, max: Infinity, label: "> $15000" },
+    { min: 50, max: 100, label: "$5000-$10000" },
+    { min: 100, max: Infinity, label: "> $10000" },
   ];
 
   const budgetData = [
-    { range: "< $1000", count: 5 },
-    { range: "$1000-$5000", count: 10 },
-    { range: "$5000-$15000", count: 3 },
-    { range: "> $15000", count: 2 },
+    { range: "< $1000", count: 1 },
+    { range: "$1000-$5000", count: 2 },
+    { range: "$5000-$10000", count: 3 },
+    { range: "> $10000", count: 2 },
   ];
 
   return (
@@ -1160,7 +1165,6 @@ export const BudgetTable = (props) => {
   );
 };
 
-
 const GenerateChart = (props) => {
   const projects = props.projects;
   const [timelines, setTimeline] = useState([]);
@@ -1179,6 +1183,7 @@ const GenerateChart = (props) => {
     getBudgetData();
     getTimelineData();
   }, []);
+
   const getChartData3 = (projects) => {
     const inProgress = projects.filter((project) => {
       return project.ProjectStatus === "In progress";
@@ -1198,6 +1203,34 @@ const GenerateChart = (props) => {
       ],
     };
   };
+
+  const pieChartOptions = {
+    maintainAspectRatio: false,
+    legend: {
+      position: "bottom",
+    },
+    plugins: {
+      datalabels: {
+        display: true,
+        color: "white",
+        font: {
+          weight: "bold",
+        },
+        formatter: (value, context) => {
+          return context.chart.data.labels[context.dataIndex];
+        },
+      },
+    },
+    scales: {
+      x: {
+        backgroundColor: "white",
+      },
+      y: {
+        backgroundColor: "white",
+      },
+    },
+  };
+
   const getChartData4 = (projects, timelines) => {
     const now = new Date();
     const inProgress = projects.filter((project) => {
@@ -1225,43 +1258,58 @@ const GenerateChart = (props) => {
       ],
     };
   };
+
+  const barChartOptions = {
+    maintainAspectRatio: false,
+    scales: {
+      yAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+          },
+          backgroundColor: "white",
+        },
+      ],
+      xAxes: [
+        {
+          ticks: {
+            beginAtZero: true,
+          },
+          backgroundColor: "white",
+        },
+      ],
+    },
+  };
   return (
-    <div id="pdffile">
-      <section class="report-dashboard">
-        <div class="row">
-          <div class="flex-container">
-            <div class="report-dashboard-item">
-              {/* {console.log(projects.ProjectId)} */}
+    <div id="pdffile" style={{ backgroundColor: "white" }}>
+      <section className="report-dashboard">
+        <div className="row">
+          <div className="flex-container" style={{ textAlign: "center" }}>
+            <div className="report-dashboard-item">
               <div
                 style={{
                   width: 600,
                   height: 600,
                   overflow: "auto",
                   margin: "auto",
+                  display: "inline-block",
                 }}
               >
-                <Pie data={getChartData3(projects)} />
+                <Pie data={getChartData3(projects)} options={pieChartOptions} />
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="report-dashboard">
-        <div class="row">
-          <div class="flex-container">
-            <div class="report-dashboard-item">
               <div
                 style={{
                   width: 600,
                   height: 600,
                   overflow: "auto",
                   margin: "auto",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: "inline-block",
                 }}
               >
-                <Bar data={getChartData4(projects, timelines)} />
+                <Bar
+                  data={getChartData4(projects, timelines)}
+                  options={barChartOptions}
+                />
               </div>
             </div>
           </div>
@@ -1272,44 +1320,50 @@ const GenerateChart = (props) => {
 };
 
 export const CreateDocxButton = (props) => {
-  const generateDocx = (element, filename = '') => {
-    var preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+  const generateDocx = (element, filename = "") => {
+    var preHtml =
+      "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
     var postHtml = "</body></html>";
-    var html = preHtml+document.getElementById(element).innerHTML+postHtml;
+    var html = preHtml + document.getElementById(element).innerHTML + postHtml;
 
-    var blob = new Blob(['\ufeff', html], {
-        type: 'application/msword'
+    var blob = new Blob(["\ufeff", html], {
+      type: "application/msword",
     });
-    
+
     // Specify link url
-    var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
-    
+    var url =
+      "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+
     // Specify file name
-    filename = filename?filename+'.doc':'document.doc';
-    
+    filename = filename ? filename + ".doc" : "document.doc";
+
     // Create download link element
     var downloadLink = document.createElement("a");
 
     document.body.appendChild(downloadLink);
-    
-    if(navigator.msSaveOrOpenBlob ){
-        navigator.msSaveOrOpenBlob(blob, filename);
-    }else{
-        // Create a link to the file
-        downloadLink.href = url;
-        
-        // Setting the file name
-        downloadLink.download = filename;
-        
-        //triggering the function
-        downloadLink.click();
+
+    if (navigator.msSaveOrOpenBlob) {
+      navigator.msSaveOrOpenBlob(blob, filename);
+    } else {
+      // Create a link to the file
+      downloadLink.href = url;
+
+      // Setting the file name
+      downloadLink.download = filename;
+
+      //triggering the function
+      downloadLink.click();
     }
-    
+
     document.body.removeChild(downloadLink);
   };
 
-  return <StdButton onClick={() => generateDocx('pdffile', 'word.docx')}>Generate DOCX</StdButton>;
-};  
+  return (
+    <StdButton onClick={() => generateDocx("pdffile", "word.docx")}>
+      Generate DOCX
+    </StdButton>
+  );
+};
 
 export const CreatePDFButton = (props) => {
   const exportPDF = () => {
