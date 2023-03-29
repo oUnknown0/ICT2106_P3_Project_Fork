@@ -45,6 +45,11 @@ namespace YouthActionDotNet.Models
         [JsonIgnore]
         public virtual Budget Budget { get; set; }
 
+        public int CompareById(Project y)
+        {
+          return this.ProjectId.CompareTo(y.ProjectId);
+        } 
+
         public void Attach(IObserver observer) {
             observers.Add(observer);
         }
@@ -91,9 +96,6 @@ public class ConcreteObserver : YouthActionDotNet.Models.IObserver
   public void Unsubscribe() {
     projects.Detach(this);
   }
-          public int CompareById(Project y)
-        {
-            return this.ProjectId.CompareTo(y.ProjectId);
-        } 
+
 }
 
