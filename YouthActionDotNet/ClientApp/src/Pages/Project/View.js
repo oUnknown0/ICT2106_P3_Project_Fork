@@ -15,7 +15,9 @@ import cloud from "d3-cloud";
 import { Pie, Bar, Line } from "react-chartjs-2";
 import { CreatePDFButton } from "./Project";
 import { CreateDocxButton } from "./Project";
-
+import html2canvas from "html2canvas";
+import JsPDF from "jspdf";
+import { StdButton } from "../../Components/common";
 //feedback charts for satisfaction and recommend
 const FeedbackCharts = ({ satisfactionData, recommendData }) => {
   const satisfactionChartRef = useRef(null);
@@ -122,7 +124,14 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
 
   return (
     <div style={{ display: "flex" }}>
-      <div style={{ flex: 1, marginLeft: "50px", marginRight: "50px", overflow: "auto"}}>
+      <div
+        style={{
+          flex: 1,
+          marginLeft: "50px",
+          marginRight: "50px",
+          overflow: "auto",
+        }}
+      >
         <h3>Satisfaction Data</h3>
         <canvas ref={satisfactionChartRef} />
       </div>
@@ -594,27 +603,28 @@ export default class View extends React.Component {
                 feedbackTextData={feedbackTextDataForProject}
               />
             </div>
-            <div>
-              <VolunteerTable
-                deleteVolunteer={this.deleteVolunteer}
-                data={data[0]}
-              />
-              <h1 style={{ marginTop: "100px", marginBottom: "20px" }}>
-                Add Volunteers to this Project
-              </h1>
-              {console.log(this.state.volunteer)}
-              <TableButton
-                volunteerData={this.state.volunteer}
-                setVolunteerList={this.setVolunteerList}
-                deleteVolunteer={this.deleteVolunteer}
-                data={data[0]}
-                volunteerList={this.state.selectedVolunteer}
-              />
-            </div>
-            <CreatePDFButton />
-            <br></br>
-            <CreateDocxButton />
+
+            <VolunteerTable
+              deleteVolunteer={this.deleteVolunteer}
+              data={data[0]}
+            />
           </div>
+          <h1 style={{ marginTop: "100px", marginBottom: "20px" }}>
+            Add Volunteers to this Project
+          </h1>
+          {console.log(this.state.volunteer)}
+          <TableButton
+            volunteerData={this.state.volunteer}
+            setVolunteerList={this.setVolunteerList}
+            deleteVolunteer={this.deleteVolunteer}
+            data={data[0]}
+            volunteerList={this.state.selectedVolunteer}
+          />
+
+          <CreatePDFButton2 />
+          <br></br>
+          <CreateDocxButton />
+
           <br></br>
           <Button onClick={() => this.setVolunteer()}>Submit</Button>
         </DatapageLayout>
@@ -622,6 +632,24 @@ export default class View extends React.Component {
     }
   }
 }
+export const CreatePDFButton2 = (props) => {
+  const exportPDF = () => {
+    const budgettable = document.getElementById("pdffile");
+
+    // Use html2canvas to generate a canvas element from the table
+    html2canvas(budgettable).then((tableCanvas) => {
+      const tableImgData = tableCanvas.toDataURL("image/png", 1.0);
+
+      let pdf = new JsPDF("p", "pt", "a4");
+
+      pdf.addImage(tableImgData, "PNG", 0, 0, 595, 842);
+
+      pdf.save("Default.pdf");
+    });
+  };
+
+  return <StdButton onClick={() => exportPDF()}>Generate PDF</StdButton>;
+};
 
 const ProjectTable = (props) => {
   const data = props.data;
