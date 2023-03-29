@@ -147,8 +147,8 @@ export default class Project extends React.Component {
       return perm === "Module"
         ? null
         : perms[perm] === true
-        ? reformattedPerms.push(perm)
-        : null;
+          ? reformattedPerms.push(perm)
+          : null;
     });
 
     this.setState({
@@ -378,7 +378,7 @@ export default class Project extends React.Component {
       return res.json();
     });
   };
-  
+
   updateLog = async (data) => {
     console.log(data);
     return fetch(`${this.settings.api}UpdateAndFetch/${data.logId}`, {
@@ -391,7 +391,7 @@ export default class Project extends React.Component {
       return res.json();
     });
   };
-  
+
   handleLogUpdate = async (data) => {
     await this.updateLog(data).then((content) => {
       if (content.success) {
@@ -1435,41 +1435,63 @@ const GenerateChart = (props) => {
 
 export const CreateDocxButton = (props) => {
   const generateDocx = (element, filename = "") => {
-    var preHtml =
-      "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
-    var postHtml = "</body></html>";
-    var html = preHtml + document.getElementById(element).innerHTML + postHtml;
+    const canvas = document.getElementsByTagName("canvas");
 
-    var blob = new Blob(["\ufeff", html], {
-      type: "application/msword",
+    const budgettable = document.getElementById("budgettable");
+    // Use html2canvas to generate a canvas element from the table
+    html2canvas(budgettable).then((tableCanvas) => {
+      const tableImgData = tableCanvas.toDataURL("image/png", 1.0);
+
+      const imgData = canvas[0].toDataURL("image/png", 1.0);
+      const imgData2 = canvas[1].toDataURL("image/png", 1.0);
+
+
+      var preHtml =
+        "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+      var postHtml = "</body></html>";
+      // var html = preHtml + document.getElementById(element).innerHTML + postHtml;
+      var html = preHtml 
+      + "<h2>Projects in progress and completed</h2>"
+      + "<img src='" + imgData + "' width='600' height='600'/>" 
+      + "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>" 
+      + "<h2>Days left to completion</h2>"
+      + "<img src='" + imgData2 + "' width='600' height='600'/>" 
+      + "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>" 
+      + "<h2>Number of projects in budget range</h2>"
+      + "<img src='" + tableImgData + "' width='600'/>" 
+      + postHtml;
+
+      var blob = new Blob(["\ufeff", html], {
+        type: "application/msword",
+      });
+
+      // Specify link url
+      var url =
+        "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+
+      // Specify file name
+      filename = filename ? filename + ".doc" : "document.doc";
+
+      // Create download link element
+      var downloadLink = document.createElement("a");
+
+      document.body.appendChild(downloadLink);
+
+      if (navigator.msSaveOrOpenBlob) {
+        navigator.msSaveOrOpenBlob(blob, filename);
+      } else {
+        // Create a link to the file
+        downloadLink.href = url;
+
+        // Setting the file name
+        downloadLink.download = filename;
+
+        //triggering the function
+        downloadLink.click();
+      }
+
+      document.body.removeChild(downloadLink);
     });
-
-    // Specify link url
-    var url =
-      "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
-
-    // Specify file name
-    filename = filename ? filename + ".doc" : "document.doc";
-
-    // Create download link element
-    var downloadLink = document.createElement("a");
-
-    document.body.appendChild(downloadLink);
-
-    if (navigator.msSaveOrOpenBlob) {
-      navigator.msSaveOrOpenBlob(blob, filename);
-    } else {
-      // Create a link to the file
-      downloadLink.href = url;
-
-      // Setting the file name
-      downloadLink.download = filename;
-
-      //triggering the function
-      downloadLink.click();
-    }
-
-    document.body.removeChild(downloadLink);
   };
 
   return (
@@ -1583,10 +1605,10 @@ class ViewManagement extends React.Component {
                     <FaFileCsv size={30} />
                     {this.props.children
                       ? this.props.children[
-                          index +
-                            (this.state.currentPage - 1) *
-                              this.state.itemsPerPage
-                        ]
+                      index +
+                      (this.state.currentPage - 1) *
+                      this.state.itemsPerPage
+                      ]
                       : ""}
                   </ExpandableRow>
                 );
