@@ -851,6 +851,7 @@ const DisplayTables = (props) => {
           ProjectCompletionDate: projRef[0].ProjectCompletionDate,
           ProjectVolunteer: projRef[0].ProjectVolunteer,
           ProjectStatus: projRef[0].ProjectStatus,
+          ProjectViewStatus: projRef[0].ProjectViewStatus,
           // ProjectType: projRef[0].ProjectType,
           ServiceCenterId: projRef[0].ServiceCenterId,
         };
