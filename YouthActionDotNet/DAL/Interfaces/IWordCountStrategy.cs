@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace YouthActionDotNet.Models
 {
-    internal interface IWordCountStrategy<T>
+    internal interface IWordCountStrategy
     {
-        public Dictionary<string, int> wordCounter();
+        public Dictionary<string, int> wordCounter(List<Feedback> feedbackList);
     }
 }
