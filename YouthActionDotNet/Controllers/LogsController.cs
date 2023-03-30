@@ -28,9 +28,9 @@ namespace YouthActionDotNet.Controllers
             logsControl = new LogsControl(context);
         }
 
-        public Task<ActionResult<string>> All()
+        public async Task<ActionResult<string>> All()
         {
-            throw new NotImplementedException();
+            return await logsControl.All();
         }
 
         [HttpPost("Create")]
