@@ -105,6 +105,14 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
         options: {
           height: 20,
           width: 20,
+          scales: {
+            x: {
+              beginAtZero: true,
+            },
+            y: {
+              beginAtZero: true,
+            },
+          },
         },
       });
 
@@ -121,13 +129,26 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
   ]);
 
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ flex: 1, marginLeft: "50px", marginRight: "50px", overflow: "auto"}}>
+    <div>
+      <div
+        style={{
+          width: 800,
+          marginLeft: "50px",
+          marginRight: "50px",
+          display: "inline-block",
+        }}
+      >
         <h3>Satisfaction Data</h3>
         <canvas ref={satisfactionChartRef} />
       </div>
       <div
-        style={{ flex: 1, marginLeft: "20px", height: "360px", width: "767px" }}
+        style={{
+          width: 500,
+          height: 400,
+          marginLeft: "100px",
+          marginRight: "50px",
+          display: "inline-block",
+        }}
       >
         <h3>Recommend Data</h3>
         <canvas ref={recommendChartRef} />
@@ -446,7 +467,7 @@ export default class View extends React.Component {
       return item.ProjectId === id;
     });
 
-    const projectVolunteers = JSON.parse(Project[0]?.ProjectType || "[]");
+    const projectVolunteers = JSON.parse(Project[0]?.ProjectVolunteer || "[]");
 
     const data = {
       ...Project[0],
@@ -467,12 +488,12 @@ export default class View extends React.Component {
     });
 
     const filteredVolunteers = JSON.parse(
-      Project[0]?.ProjectType || "[]"
+      Project[0]?.ProjectVolunteer || "[]"
     ).filter((item) => item?.UserId !== vol?.UserId);
     const data = {
       ...Project[0],
       ProjectId: Project[0]?.ProjectId,
-      ProjectType: JSON.stringify(filteredVolunteers),
+      ProjectVolunteer: JSON.stringify(filteredVolunteers),
     };
     this.handleUpdate(data);
   };

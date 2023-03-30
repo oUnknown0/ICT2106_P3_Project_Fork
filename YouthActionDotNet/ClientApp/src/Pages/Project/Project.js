@@ -1019,6 +1019,7 @@ export const ProjectTable = (props) => {
               Project Name
             </th>
             <th
+              style={{ cursor: "pointer" }}
               colSpan={2}
               onClick={() => {
                 console.log(sorting);
@@ -1035,11 +1036,13 @@ export const ProjectTable = (props) => {
               Project Type
             </th> */}
             <th
+              style={{ cursor: "pointer" }}
               onClick={() => applySorting("ProjectBudget", !sorting.ascending)}
             >
               Project Budget
             </th>
             <th
+              style={{ cursor: "pointer" }}
               onClick={() =>
                 applySorting("ProjectStartDate", !sorting.ascending)
               }
@@ -1047,11 +1050,13 @@ export const ProjectTable = (props) => {
               Start Date
             </th>
             <th
+              style={{ cursor: "pointer" }}
               onClick={() => applySorting("ProjectEndDate", !sorting.ascending)}
             >
               End Date
             </th>
             <th
+              style={{ cursor: "pointer" }}
               onClick={() => applySorting("ProjectStatus", !sorting.ascending)}
             >
               Project Status
