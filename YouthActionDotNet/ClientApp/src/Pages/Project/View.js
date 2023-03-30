@@ -105,14 +105,6 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
         options: {
           height: 20,
           width: 20,
-          scales: {
-            x: {
-              beginAtZero: true,
-            },
-            y: {
-              beginAtZero: true,
-            },
-          },
         },
       });
 
@@ -129,17 +121,18 @@ const FeedbackCharts = ({ satisfactionData, recommendData }) => {
   ]);
 
   return (
-    <div>
-      <div style={{ width: 800, marginLeft: "50px", marginRight: "50px", display: "inline-block" }}>
+    <div style={{ display: "flex" }}>
+      <div style={{ flex: 1, marginLeft: "50px", marginRight: "50px", overflow: "auto"}}>
         <h3>Satisfaction Data</h3>
         <canvas ref={satisfactionChartRef} />
       </div>
-      <div style={{ width: 500, height: 400, marginLeft: "100px", marginRight: "50px", display: "inline-block" }}>
+      <div
+        style={{ flex: 1, marginLeft: "20px", height: "360px", width: "767px" }}
+      >
         <h3>Recommend Data</h3>
         <canvas ref={recommendChartRef} />
       </div>
     </div>
-
   );
 };
 
@@ -453,7 +446,7 @@ export default class View extends React.Component {
       return item.ProjectId === id;
     });
 
-    const projectVolunteers = JSON.parse(Project[0]?.ProjectVolunteer || "[]");
+    const projectVolunteers = JSON.parse(Project[0]?.ProjectType || "[]");
 
     const data = {
       ...Project[0],
@@ -474,12 +467,12 @@ export default class View extends React.Component {
     });
 
     const filteredVolunteers = JSON.parse(
-      Project[0]?.ProjectVolunteer || "[]"
+      Project[0]?.ProjectType || "[]"
     ).filter((item) => item?.UserId !== vol?.UserId);
     const data = {
       ...Project[0],
       ProjectId: Project[0]?.ProjectId,
-      ProjectVolunteer: JSON.stringify(filteredVolunteers),
+      ProjectType: JSON.stringify(filteredVolunteers),
     };
     this.handleUpdate(data);
   };
@@ -765,62 +758,6 @@ const ProjectTable = (props) => {
     </>
   );
 };
-
-function FeedbackTable(props) {
-  console.log(props);
-  return (
-    <>
-      <h1 style={{ marginTop: "50px" }}>Current Volunteers</h1>
-      <div>
-        <Table striped bordered hover style={{ marginTop: "30px" }}>
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>User Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          {JSON.parse(props?.data.ProjectVolunteer || "[]")?.length > 0 ? (
-            JSON.parse(props?.data.ProjectVolunteer || "[]").map((item) => {
-              console.log(item);
-              return (
-                <>
-                  <tbody>
-                    <tr>
-                      <td>{item?.UserId || "N/A"}</td>
-                      <td>{item?.username || "N/A"}</td>
-                      <td>{item?.Email || "N/A"}</td>
-                      <td>{item?.Role || "N/A"}</td>
-
-                      <td>
-                        <Button
-                          variant="outline-danger"
-                          onClick={() => {
-                            props?.deleteVolunteer(item);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </>
-              );
-            })
-          ) : (
-            <div style={{ textAlign: "center" }}>
-              <h1>No volunteers allocated to this project!</h1>
-            </div>
-          )}
-        </Table>
-      </div>
-    </>
-  );
-}
-
 function TableButton(props) {
   // Please Note replace projectType variable to new varibal that
   //for the volunteer List and it should be String
