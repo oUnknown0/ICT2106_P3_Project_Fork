@@ -659,6 +659,8 @@ export default class View extends React.Component {
           <CreatePDFButton2 />
           <br></br>
           <CreateDocxButton2 />
+          <br></br>
+          <StdButton>Generate XLS</StdButton>
 
           <br></br>
           <Button onClick={() => this.setVolunteer()}>Submit</Button>

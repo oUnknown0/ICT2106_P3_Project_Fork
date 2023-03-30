@@ -667,26 +667,6 @@ export default class Project extends React.Component {
             permissions={this.props.permissions}
             requestError={this.requestError}
             has={this.has}
-            extraComponents={[
-              {
-                label: "Archived Projects",
-                key: "archivedProjects",
-                requiredPerms: ["Create", "Update", "Delete", "Read"],
-                component: (
-                  <ViewManagement
-                    settings={this.settings}
-                    requestArchived={this.requestArchived}
-                    updateHandle={this.props.updateHandle}
-                    headers={this.state.settings.data.ColumnSettings}
-                    fieldSettings={this.state.settings.data.FieldSettings}
-                    setExpansionContent={this.props.setExpansionContent}
-                    data={this.state.archived.data}
-                    requestError={this.requestError}
-                    api={this.settings.api}
-                  ></ViewManagement>
-                ),
-              },
-            ]}
           >
             <DisplayTables
               data={this.state.content.data}
@@ -960,6 +940,8 @@ const DisplayTables = (props) => {
             <CreatePDFButton />
             <br></br>
             <CreateDocxButton />
+            <br></br>
+            <StdButton>Generate XLS</StdButton>
           </Accordion.Body>
         </Accordion.Item>
 
