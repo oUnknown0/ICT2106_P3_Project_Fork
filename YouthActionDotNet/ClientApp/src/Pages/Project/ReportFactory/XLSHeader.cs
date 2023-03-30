@@ -1,5 +1,8 @@
 public class XLSHeader : iHeader {
-   public void setText() {
-      
-   }
+
+   private string headerText;
+    public void SetText(string text) {
+        // Implementation for setting text in XLSX header
+        headerText = text;
+    }
 }

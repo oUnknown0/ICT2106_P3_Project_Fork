@@ -1,5 +1,9 @@
 public class DocxFooter : iFooter {
-   public void setText() {
-      
+
+   private string footerText;
+   public void SetText(string text) {
+      footerText = text;
    }
+
+
 }

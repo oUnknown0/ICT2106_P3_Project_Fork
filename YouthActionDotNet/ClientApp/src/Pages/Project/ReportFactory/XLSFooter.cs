@@ -1,5 +1,8 @@
 public class XLSFooter : iFooter {
-   public void setText() {
-      
-   }
+
+   private string footerText;
+    public void SetText(string text) {
+        // Implementation for setting text in XLSX header
+        footerText = text;
+    }
 }

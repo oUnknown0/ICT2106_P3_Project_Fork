@@ -1,5 +1,7 @@
 public class DocxHeader : iHeader {
-   public void setText() {
-      
+   private string headerText;
+   
+   public void setText(string text) {
+      headerText = text;
    }
 }

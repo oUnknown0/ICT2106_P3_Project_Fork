@@ -1,11 +1,12 @@
 public class XLSReportFactory : IReportFactory {
-   public override void createHeader(){
-        
-   }
-   public override void createBody(){
 
-   }
-   public override void createFooter(){
-
-   }
+    public iHeader CreateHeader() {
+        return new XLSHeader();
+    }
+    public iBody CreateBody() {
+        return new XLSBody();
+    }
+    public iFooter CreateFooter() {
+        return new XLSFooter();
+    }
 }

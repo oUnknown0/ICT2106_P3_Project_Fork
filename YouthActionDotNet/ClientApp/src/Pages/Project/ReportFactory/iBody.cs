@@ -1,3 +1,6 @@
 public interface iBody {
-   public void addRow();
+       public void addRow()
+    {
+        throw new System.NotImplementedException();
+    }
 }

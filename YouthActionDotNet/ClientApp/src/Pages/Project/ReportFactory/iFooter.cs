@@ -1,3 +1,6 @@
 public interface iFooter {
-   public void setText();
+       public void setText()
+    {
+        throw new System.NotImplementedException();
+    }
 }

@@ -1,5 +1,11 @@
+using System.Collections.Generic;
+
 public class DocxBody : iBody {
-   public void addRow() {
-      
+
+   private List<string[]> rows = new List<string[]>();
+   public void AddRow(string[] rowData) {
+      rows.Add(rowData);
    }
+
+
 }

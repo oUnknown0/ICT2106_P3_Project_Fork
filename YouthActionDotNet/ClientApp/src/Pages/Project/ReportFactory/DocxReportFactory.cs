@@ -1,11 +1,11 @@
 public class DocxReportFactory : IReportFactory {
-   public override void createHeader(){
-        
-   }
-   public override void createBody(){
-
-   }
-   public override void createFooter(){
-
-   }
+    public iHeader CreateHeader() {
+        return new DocxHeader();
+    }
+    public iBody CreateBody() {
+        return new DocxBody();
+    }
+    public iFooter CreateFooter() {
+        return new DocxFooter();
+    }
 }

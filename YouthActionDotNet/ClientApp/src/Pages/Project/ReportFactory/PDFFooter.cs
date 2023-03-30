@@ -1,5 +1,9 @@
 public class PDFFooter : iFooter {
-   public void setText() {
-      
-   }
+
+   private string footerText;
+    public void SetText(string text) {
+        // Implementation for setting text in PDF footer
+        footerText = text;
+        
+    }
 }
