@@ -10,7 +10,7 @@ cd ..
 
 dotnet run
 
-# MODULE 1 TEAM 3
+# MODULE 3 TEAM 3
 
 Sample Donor
 username: test 
